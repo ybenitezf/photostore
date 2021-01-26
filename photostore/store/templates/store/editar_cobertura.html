@@ -1,0 +1,139 @@
+{% extends 'layout_full.html' %}
+
+{% block page_title %}Coberturas - {{ cobertura.headline }}{% endblock %}
+
+{% block content %}
+
+<div class="row">
+
+    <div class="col s6">
+
+        <h4>Fotos</h4>
+        <div class="gallery--row" data-controller="galeria" data-action="photo-removed->galeria#photoRemoved">
+
+            {% for column in cobertura.photos|slice(3) %}
+            <div class="gallery--col">
+                {% for foto in column %}
+                <div class="card" 
+                    data-controller="foto" 
+                    data-foto-id-value="{{ foto.md5 }}"
+                    data-foto-apiremove-value="{{ url_for('photos_api.detach_photo', id_cov=cobertura.id) }}">
+                    
+                    <div class="card-image">
+                        <img class="responsive-img" src="{{ url_for('.photo_thumbnail', id=foto.md5) }}" />
+                    </div>
+                    <div class="card-action">
+                        <a class="btn-small waves-effect waves-light red darken-4 disabled px-1"
+                            title="Quitar de la galeria, no elimina la foto."
+                            data-foto-target="btnRemove"
+                            data-action="click->foto#removeFromCoverage">
+                            <i class="material-icons">remove</i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+
+        </div>
+        <p class="grey-text text-darken-2 mx-4">
+            Las fotos solo se eliminan de la galería, estas no se eliminan
+            nunca del archivo fotográfico.
+        </p>
+
+    </div>
+
+    <div class="col s6">
+        <h4>Datos de la galería</h4>
+        <p class="grey-text text-darken-2">
+            Los cambios a estos datos solo afectan a la galería.
+            A menos que se marque la casilla
+            <strong>Aplicar cambios a las fotos</strong> en cuyo caso
+            los cambios se aplicarán también a todas las fotos
+        </p>
+        <!-- datos de la cobertura -->
+        <div class="mt-5" data-controller="cobertura"
+            data-cobertura-apiendpoint-value="{{ url_for('photos_api.update_coverage', id=cobertura.id) }}">
+            <div class="input-field">
+                <input data-cobertura-target="headline" type="text" name="headline" id="headline_field" class="validate"
+                    required autocomplete="off" value="{{ cobertura.headline }}">
+                <label for="headline_field">Título descriptivo</label>
+            </div>
+            <div class="input-field">
+                <input data-cobertura-target="creditline" type="text" name="creditline" id="creditline_field"
+                    class="validate" value="{{ cobertura.credit_line }}" required>
+                <label for="creditline_field">Creditos</label>
+            </div>
+            <div class="input-field" data-controller="chips" data-cobertura-target="tags"
+                data-chips-placeholder-value="Palabras clave"
+                data-chips-secondary-value="+Palabra">
+                <input type="hidden" name="tags" id="f_tags" value='{{ cobertura.keywords|tojson|safe }}' data-chips-target="input">
+                <label class="active" for="f_tags">Palabras clave</label>
+                <div class="chips chips-initial" data-chips-target="view"></div>
+                <span class="helper-text">
+                    Ingrese la palabra clave y presione <code class="grey darken-3 white-text p-1">ENTER</code>
+                </span>
+            </div>
+            <div class="input-field px-3 mt-5 mb-5" data-controller="editor"
+                data-editor-placeholder-value="Escribe aquí una descripción de la cobertura"
+                data-cobertura-target="excerpt">
+                <input data-editor-target="input" type="hidden" name="excerpt_data" value='{{ cobertura.excerpt | safe }}'>
+                <div id="excerpt_field" data-editor-target="editor"></div>
+            </div>
+            <div class="row">
+                <div class="col s6">
+                    <div class="switch">
+                        <label>
+                            <input data-cobertura-target="updatephotos" type="checkbox" name="updatephotos"
+                                id="updatephotos_id">
+                            <span class="lever"></span>
+                            Actualizar los datos de todas las fotos
+                        </label>
+                    </div>
+                </div>
+                <div class="col s6">
+                    <a class="btn waves-effect waves-light disabled" data-action="click->cobertura#guardar"
+                        data-cobertura-target="btn">Guardar</a>
+                </div>
+            </div>
+        </div>
+        <!-- end: datos de la cobertura -->
+        <hr />
+        <!-- agregar mas fotos -->
+        <div class="uploaderwraper mt-5">
+            <h4>Agrega otra foto</h4>
+            <p class="grey-text text-darken-2">
+                La foto será agregada con los datos actuales de la galería.
+                Si ha realizado cambios a los datos anteriores, debe
+                guardarlos primero y entonces agregar la foto.
+            </p>
+            <form data-controller="imageupload" action="{{ url_for('.handle_upload') }}" method="POST"
+                data-imageupload-apiendpoint-value="{{ url_for('photos_api.attach_photo', id_cov=cobertura.id) }}">
+                <input type="hidden" name="healine" value='{{ cobertura.headline }}'>
+                <input type="hidden" name="creditline" value='{{ cobertura.credit_line }}'>
+                <input type="hidden" name="keywords" value='{{ cobertura.keywords | tojson | safe }}'>
+                <input type="hidden" name="excerpt" value='{{ cobertura.excerpt|safe }}'>
+                <input type="hidden" name="taken_by" value='{{ current_user.name }}'>
+                <div class="file-field input-field">
+                    <div class="btn btn-small waves-effect waves-light" data-imageupload-target="btn">
+                        <i class="material-icons left">add_a_photo</i>
+                        <span>Agregar Foto</span>
+                        <input type="file" name="image" accept="image/*" data-imageupload-target="file" />
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!-- end -->
+    </div>
+
+</div>
+
+{% endblock%}
+
+
+{% block page_js %}
+<script src="{{ static_url_for('static', filename='js/editcobertura.js') }}"></script>
+{% endblock %}

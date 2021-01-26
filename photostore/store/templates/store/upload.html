@@ -1,0 +1,79 @@
+{% extends 'layout_full.html' %}
+
+{% block page_title %}Subir fotos - Almacén de fotos{% endblock %}
+
+{% block content %}
+    <div 
+        class="row" data-controller="newcov" 
+        data-newcov-uploadendpoint-value="{{ url_for('photos.handle_upload') }}"
+        data-newcov-api-value="{{ url_for('photos_api.create_coverage') }}"
+        data-newcov-postback-value="{{ url_for('photos.index') }}">
+
+        <div class="col s6">
+
+            <section>
+                <!-- dropzone -->
+                <div class="row">
+                    <div class="col s12">
+                       <div id="photos_drop" data-newcov-target="photos"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="col s6">
+            <section class="px-3">
+                <!-- fields -->
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input data-newcov-target="headline" type="text" name="headline" id="headline_field" class="validate" required autocomplete="off">
+                        <label for="headline_field">Título descriptivo</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s6">
+                        <input data-newcov-target="creditline" type="text" name="creditline" id="creditline_field" class="validate" value="Foto de {{ current_user.name }}" required>
+                        <label for="creditline_field">Creditos</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <input data-newcov-target="takenby" type="text" name class="validate" name="taken_by" id="taken_by_field" value="" required />
+                        <label for="creditline_field">Author</label>
+                        <span class="helper-text">
+                            Si se establece reemplaza los datos en la foto.
+                        </span>
+                    </div>
+                </div>
+        
+                <div class="row">
+                    <div class="input-field col s12">
+                        <div class="chips chips-placeholder" data-newcov-target="tags"></div>
+                        <span class="helper-text">
+                            Ingrese la palabra clave y presione <code class="grey darken-3 white-text p-1">enter</code>
+                        </span>
+                    </div>
+                </div>
+        
+                <div class="row">
+                    <div class="input-field col s12">
+                        <div id="excerpt_field" data-newcov-target="resumen"></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col s12">
+                        <a class="waves-effect waves-light btn disabled" data-action="click->newcov#save" data-newcov-target="sendbtn">
+                            <i class="material-icons right">send</i>Crear
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+{% endblock content %}
+
+
+{% block page_js %}
+<script src="{{ static_url_for('static', filename='js/photoupload.js') }}"></script>
+{% endblock %}

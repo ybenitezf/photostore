@@ -1,0 +1,57 @@
+{% extends 'layout_full.html' %}
+
+{% block content %}
+<div class="row">
+    <form action="{{ url_for('.buscar_indice') }}" method="POST" class="col s12 px-5">
+        {{ search_form.csrf_token }}
+        <div class="col s11 input-field">
+            <i class="material-icons prefix">search</i>
+            <input id="userq_field" type="search" class="validate" name="userquery" required>
+            <label class="active" for="userq_field">Buscar</label>
+        </div>
+        <div class="col s1 input-field">
+            <button class="btn waves-effect waves-light" type="submit" name="action">
+                <i class="material-icons">search</i>
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="results-wrapper container">
+    {% if fotos.items %}
+        <div class="row">
+            <div class="col s12">
+                {% with lista_fotos = fotos.items %}
+                    {% include "store/_foto_gallery.html" %}
+                {% endwith %}
+            </div>
+        </div>
+
+        <!-- paginacion -->
+        {% if fotos.has_prev or fotos.has_next %}
+        <div class="row">
+            <div class="col s12">
+                <div class="center-align mt-5">
+                    <a href="{{ '#!' if fotos.has_prev is false else url_for('.mis_fotos', page=fotos.prev_num)}}" class="waves-effect waves-light btn {{ 'disabled' if fotos.has_prev is false else ''}}"><i class="material-icons left">chevron_left</i> Anterior</a>
+                    <a href="{{ '#!' if fotos.has_next is false else url_for('.mis_fotos', page=fotos.next_num)}}" class="waves-effect waves-light btn ml-5 {{ 'disabled' if fotos.has_next is false else ''}}">Siguiente <i class="material-icons right">chevron_right</i></a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    {% else %}
+        <div class="row">
+            <div class="col s12">
+                    <h1 class="center-align">No hay fotos tuyas en el sistema</h1>
+                    <p class="center-align">
+                        <a class="waves-effect waves-light btn" href="{{ url_for('.upload_coverture') }}"><i class="material-icons right">cloud_upload</i>Subir fotos</a>
+                    </p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block page_js %}
+<script src="{{ static_url_for('static', filename='js/myphotospage.js') }}"></script>
+{% endblock %}

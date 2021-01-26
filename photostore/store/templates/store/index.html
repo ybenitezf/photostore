@@ -1,0 +1,89 @@
+{% extends 'layout.html' %}
+
+{% block page_title %}Coberturas - Almacén de fotos{% endblock %}
+
+{% block content %}
+<div class="row">
+    <form action="{{ url_for('.buscar_indice') }}" method="POST" class="col s12 px-5">
+        {{ form.csrf_token }}
+        <div class="col s11 input-field">
+            <input id="userq_field" type="search" class="validate" name="userquery" required>
+            <label class="active" for="userq_field">Buscar</label>
+        </div>
+        <div class="col s1 input-field">
+            <button class="btn waves-effect waves-light" type="submit" name="action">
+                <i class="material-icons">search</i>
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="works-list px-5">
+
+    {% if coberturas.items: %}
+
+        {% for item in coberturas.items: %}
+        <div class="card">
+            <div class="card-content">
+              <!-- titulo -->
+              <span class="card-title photocoverage-headline blue-grey-text text-darken-2">{{ item.headline }}</span>
+              <!-- fotos -->
+              {% with lista_fotos = item.photos %}
+                {% include "store/_foto_gallery.html" %}
+              {% endwith %}
+              <!-- // end fotos -->
+              <!-- descripcion -->
+              <div class="photocoverage-excerpt">
+                {{ render_excerpt(item.excerpt)|safe }}
+              </div>
+              <!-- palabras clave -->
+              <div class="photocoverage-keywords">
+                  <i class="material-icons left">label</i> 
+                  {% for k in item.keywords %}
+                  <div class="chip">{{ k }}</div>
+                  {% endfor %}
+              </div>
+              <!-- creditos -->
+              <div class="photocoverage-creditline">
+                  <i class="material-icons left">person</i> {{ item.credit_line }}
+              </div>
+              <div class="photocoverage-archivedon">
+                  <i class="material-icons left">event</i> 
+                  <span data-controller="fecha" data-fecha-momento-value="{{ item.archive_on.isoformat() }}" data-fecha-formato-value="lll">
+                    {{ item.archive_on.isoformat() }}
+                  </span>
+              </div>
+            </div>
+            {% if can_edit(item) %}
+            <div class="card-action">
+                <a href="{{ url_for('.editarCobertura', id=item.id) }}" class="waves-effect waves-light btn"> <i class="material-icons left">edit</i> Editar</a>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <!-- paginacion -->
+        {% if coberturas.has_prev or coberturas.has_next %}
+        <div class="center-align mt-5">
+            <a href="{{ '#!' if coberturas.has_prev is false else url_for('.index', page=coberturas.prev_num)}}" class="waves-effect waves-light btn {{ 'disabled' if coberturas.has_prev is false else ''}}"><i class="material-icons left">chevron_left</i> Anterior</a>
+            <a href="{{ '#!' if coberturas.has_next is false else url_for('.index', page=coberturas.next_num)}}" class="waves-effect waves-light btn ml-5 {{ 'disabled' if coberturas.has_next is false else ''}}">Siguiente <i class="material-icons right">chevron_right</i></a>
+        </div>
+        {% endif %}
+    
+    {% else %}
+
+        <div class="card">
+        <div class="card-content">
+            <span class="card-title center-align">
+            No se encontró ninguna cobertura
+            </span>
+        </div>
+        </div>
+    
+    {% endif %}
+</div>
+{% endblock content %}
+
+{% block page_js %}
+<script src="{{ static_url_for('static', filename='js/coberturaspage.js') }}"></script>
+{% endblock %}

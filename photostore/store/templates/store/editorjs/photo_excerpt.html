@@ -1,0 +1,3 @@
+{% for b in data.get('blocks') %}
+{{ block_renderer(b, format='html')|safe }}
+{% endfor %}

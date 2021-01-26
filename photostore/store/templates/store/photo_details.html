@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col s12">
+        <h1 class="headline">
+            {{ foto.headline }}
+        </h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col s4">
+        <img src="{{ url_for('.photo_thumbnail', id=foto.md5) }}" alt="" class="responsive-img">
+        <!-- toolbar -->
+        <div class="mt-3">
+            <a class="waves-effect waves-light btn" 
+                data-controller="urlcopy" 
+                data-urlcopy-url-value="{{ url_for('.fakelink', id=foto.md5, ext=foto.extension, _external=True) }}"
+                data-action="click->urlcopy#copyURL">
+                <i class="material-icons">content_copy</i>
+            </a>
+            {% if can_download_photo(foto.md5) %}
+            <a class="waves-effect waves-light btn" href="{{ url_for('.photo_download', id=foto.md5) }}">
+                <i class="material-icons">file_download</i>
+            </a>
+            {% endif %}
+            {% if can_edit %}
+            <a href="{{ url_for('.photo_edit', id=foto.md5) }}" class="waves-effect waves-light btn"><i class="material-icons">edit</i></a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col s8">
+        <div class="photocoverage-excerpt">
+            {{ render_excerpt(foto.excerpt)|safe }}
+        </div>
+        <div class="photocoverage-keywords">
+            <i class="material-icons left">label</i> 
+            {% for k in foto.keywords %}
+            <div class="chip">{{ k }}</div>
+            {% endfor %}
+        </div>
+        <div class="row">
+            <div class="col s6">
+                <p><i class="material-icons left">person</i> {{ foto.taken_by }}</p>
+                <p><i class="material-icons left">file_upload</i> {{foto.uploader.name}}</p>
+                <p>
+                    <i class="material-icons left">event</i> 
+                    <span data-controller="fecha" data-fecha-momento-value="{{ foto.taken_on.isoformat() }}" data-fecha-formato-value="L">
+                        {{foto.taken_on.isoformat()}}
+                    </span>
+                </p>
+            </div>
+            <div class="col s6">
+                <!-- opcionales -->
+                {% if foto.camera %}<div class="exiftag"><i class="exificon material-icons">camera_alt</i> {{foto.camera}}</div>{% endif %}
+                {% if foto.fnumber %}<div class="exiftag"><i class="exificon material-icons">camera</i> f/{{foto.fnumber}}</div>{% endif %}
+                {% if foto.exposuretime %}<div class="exiftag"><i class="exificon material-icons">av_timer</i> {{foto.exposuretime}}s</div>{% endif %}
+                {% if foto.focal %}<div class="exiftag"><i class="exificon material-icons">lens</i> {{foto.focal}}mm</div>{% endif %}
+                {% if foto.isovalue %}<div class="exiftag"><i class="exificon material-icons">iso</i> {{foto.isovalue}}</div>{% endif %}
+                {% if foto.software %}<div class="exiftag"><i class="exificon material-icons">brush</i> {{foto.software}}</div>{% endif %}
+                {% if foto.image_width and foto.image_height %}<div class="exiftag"><i class="exificon material-icons">crop</i> {{foto.image_width}} x {{foto.image_height}}</div>{% endif %}
+                <!-- en opcionales -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block page_js %}
+<script src="{{ static_url_for('static', filename='js/photodetails_page.js') }}"></script>
+{% endblock %}
