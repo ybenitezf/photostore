@@ -1,5 +1,4 @@
 include requirements.txt
-include config.py
 graft migrations
 graft photostore/static
 graft photostore/templates

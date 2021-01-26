@@ -33,9 +33,9 @@ crumbs = Breadcrumbs()
 # Breadcrumbs is a subclass of flask_menu.Menu
 menu = crumbs
 
-def create_app(config='config.Config'):
+def create_app(config='photostore.config.Config'):
     """Inicializar la aplicación"""
-    app = Flask(__name__, instance_relative_config=False)
+    app = Flask(__name__)
     app.config.from_object(config)
     if os.getenv('APP_CONFIG') and (not app.config.get('TESTING')):
         app.config.from_object(os.getenv('APP_CONFIG'))
