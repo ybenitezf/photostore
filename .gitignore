@@ -150,15 +150,3 @@ jsclient/warning
 *-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].*
 *.gz
 cache_manifest.json
-photostore/appdb.db
-photostore/static/js/editorcomp.js
-photostore/static/js/photoupload.js
-photostore/static/js/editcobertura.js
-photostore/static/js/coberturaspage.js
-photostore/static/js/myphotospage.js
-photostore/static/js/photosearch_page.js
-photostore/static/js/photodetails_page.js
-photostore/static/js/photoedit_page.js
-photostore/static/js/init.js
-photostore/static/css/utils.css
-photostore/static/css/style.css
