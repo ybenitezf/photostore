@@ -51,7 +51,8 @@ setup(
         'apifairy',
         'marshmallow-sqlalchemy',
         'celery',
-        'Whoosh'
+        'Whoosh',
+        'adelacommon @ https://github.com/ybenitezf/adela-common/tarball/master'
     ],
     classifiers=[
         'Environment :: Web Environment', 
