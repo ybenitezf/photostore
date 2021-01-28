@@ -1,4 +1,5 @@
-from photostore.modules.flask_logs import LogSetup
+from adelacommon.deploy import deploy_cmd
+from adelacommon.flask_logs import LogSetup
 from flask.helpers import url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -96,7 +97,6 @@ def create_app(config='photostore.config.Config'):
     from photostore.store.admin import MediaAdminView
     from photostore.store.admin import PhotoCoverageAdminView
     from photostore.store.admin import PhotoAdminView
-    from adelacommon.deploy import deploy_cmd
 
     admon.init_app(app, index_view=MyAdminIndexView())
     # registrar los blueprints
