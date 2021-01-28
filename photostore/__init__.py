@@ -1,4 +1,4 @@
-from .modules.flask_logs import LogSetup
+from photostore.modules.flask_logs import LogSetup
 from flask.helpers import url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -33,13 +33,14 @@ crumbs = Breadcrumbs()
 # Breadcrumbs is a subclass of flask_menu.Menu
 menu = crumbs
 
+
 def create_app(config='photostore.config.Config'):
     """Inicializar la aplicación"""
     app = Flask(__name__)
     app.config.from_object(config)
     if os.getenv('APP_CONFIG') and (not app.config.get('TESTING')):
         app.config.from_object(os.getenv('APP_CONFIG'))
-    
+
     # ensure the instance folder exists
     os.makedirs(app.instance_path, exist_ok=True)
     if app.config.get('SQLALCHEMY_DATABASE_URI') == 'appdb.db':
@@ -64,7 +65,7 @@ def create_app(config='photostore.config.Config'):
         from werkzeug.middleware.proxy_fix import ProxyFix
 
         app.wsgi_app = ProxyFix(
-            app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, 
+            app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1,
             x_prefix=1)
 
     # inicializar otros plugins
@@ -84,62 +85,61 @@ def create_app(config='photostore.config.Config'):
     if app.config.get('CELERY_ENABLED'):
         init_celery(celery, app)
 
-    # incluir modulos y rutas
-    with app.app_context():
-        from .views.users import users_bp
-        from .searchcommands import cmd as search_cmd
-        from .admin_commands import users_cmds
-        from .views.admin import MyAdminIndexView, UserView
-        from .views.admin import RoleView, PermissionView
-        from .store.views import bp
-        from .store import photostore_api
-        from .store.admin import VolumeAdminView
-        from .store.admin import MediaAdminView
-        from .store.admin import PhotoCoverageAdminView
-        from .store.admin import PhotoAdminView
+    from photostore.views.users import users_bp
+    from photostore.searchcommands import cmd as search_cmd
+    from photostore.admin_commands import users_cmds
+    from photostore.views.admin import MyAdminIndexView, UserView
+    from photostore.views.admin import RoleView, PermissionView
+    from photostore.store.views import bp
+    from photostore.store import photostore_api
+    from photostore.store.admin import VolumeAdminView
+    from photostore.store.admin import MediaAdminView
+    from photostore.store.admin import PhotoCoverageAdminView
+    from photostore.store.admin import PhotoAdminView
+    from adelacommon.deploy import deploy_cmd
 
-        admon.init_app(app, index_view=MyAdminIndexView())
-        # registrar los blueprints
-        app.register_blueprint(users_bp)
-        app.register_blueprint(search_cmd)
-        app.register_blueprint(users_cmds)
-        login_mgr.login_view = 'users.login'
+    admon.init_app(app, index_view=MyAdminIndexView())
+    # registrar los blueprints
+    app.register_blueprint(users_bp)
+    app.register_blueprint(search_cmd)
+    app.register_blueprint(users_cmds)
+    app.register_blueprint(deploy_cmd)
+    login_mgr.login_view = 'users.login'
 
-        # admon views 
-        admon.add_views(UserView(), RoleView(), PermissionView())
-        app.register_blueprint(bp)
-        app.register_blueprint(
-            photostore_api, url_prefix='/api')
-        admon.add_view(VolumeAdminView())
-        admon.add_view(MediaAdminView())
-        admon.add_view(PhotoCoverageAdminView())
-        admon.add_view(PhotoAdminView())
+    # admon views
+    admon.add_views(UserView(), RoleView(), PermissionView())
+    app.register_blueprint(bp)
+    app.register_blueprint(
+        photostore_api, url_prefix='/api')
+    admon.add_views(
+        VolumeAdminView(), MediaAdminView(), PhotoCoverageAdminView(),
+        PhotoAdminView())
+    # the dummy thing
 
-        # the dummy thing
-        @app.route("/")
-        @register_breadcrumb(app, '.', "Inicio")
-        @register_menu(app, '.', "Inicio")
-        def home():
-            """Registrar una raiz commun para los breadcrumbs"""
-            return redirect(url_for('photos.index'))
+    @app.route("/")
+    @register_breadcrumb(app, '.', "Inicio")
+    @register_menu(app, '.', "Inicio")
+    def home():
+        """Registrar una raiz commun para los breadcrumbs"""
+        return redirect(url_for('photos.index'))
 
-        @app.before_first_request
-        def setupMenus():
-            """Crear las entradas virtuales del menu"""
-            m = menu.root()
+    @app.before_first_request
+    def setupMenus():
+        """Crear las entradas virtuales del menu"""
+        m = menu.root()
 
-            # navbar para el menu principal de la app
-            navbar = m.submenu("navbar")
-            navbar._external_url = "#!"
-            navbar._endpoint = None
-            navbar._text = "NAVBAR"
+        # navbar para el menu principal de la app
+        navbar = m.submenu("navbar")
+        navbar._external_url = "#!"
+        navbar._endpoint = None
+        navbar._text = "NAVBAR"
 
-            # actions, para el sidebar, registrar submenus debajo
-            # de este menu
-            actions = m.submenu("actions")
-            actions._external_url = "#!"
-            actions._endpoint = None
-            actions._text = "NAVBAR"
+        # actions, para el sidebar, registrar submenus debajo
+        # de este menu
+        actions = m.submenu("actions")
+        actions._external_url = "#!"
+        actions._endpoint = None
+        actions._text = "NAVBAR"
 
     return app
 
