@@ -12,8 +12,8 @@ import os
 import logging
 
 
-DEFAULT_VOL_SIZE = current_app.config.get('DEFAULT_VOL_SIZE')
-DEFAULT_MEDIA_SIZE = current_app.config.get('DEFAULT_MEDIA_SIZE')
+DEFAULT_VOL_SIZE = lambda: current_app.config.get('DEFAULT_VOL_SIZE')
+DEFAULT_MEDIA_SIZE = lambda: current_app.config.get('DEFAULT_MEDIA_SIZE')
 
 FORMATOS_FECHA = [
     '%Y:%m:%d %H:%M:%S',
@@ -95,8 +95,8 @@ class Volume(db.Model):
 
     def _volumeStatus(self) -> tuple:
         actual = Media.query.filter(Media.volume_id == self.id).count()
-        soportados = self.capacity / DEFAULT_MEDIA_SIZE
-        resto = self.capacity % DEFAULT_MEDIA_SIZE
+        soportados = self.capacity / DEFAULT_MEDIA_SIZE()
+        resto = self.capacity % DEFAULT_MEDIA_SIZE()
 
         return actual, soportados, resto
 
@@ -106,7 +106,7 @@ class Volume(db.Model):
         capacity = None
 
         if actual < soportados:
-            capacity = DEFAULT_MEDIA_SIZE
+            capacity = DEFAULT_MEDIA_SIZE()
 
         if actual == soportados and resto > 0:
             capacity = resto

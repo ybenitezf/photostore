@@ -1,12 +1,10 @@
+from photostore.models.security import Role, User, create_user as CreateUser
+from photostore.shemas import UserSchema, RoleSchema
+from photostore import db
+from flask import Blueprint
 from pprint import pprint
-from flask.cli import cli
-from .models.security import Role, User, create_user as CreateUser
-from .shemas import UserSchema, RoleSchema
-from . import db
-from flask import Blueprint, current_app
 import click
 
-admin_cmds = Blueprint("admin", __name__)
 users_cmds = Blueprint("security", __name__)
 
 
