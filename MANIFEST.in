@@ -2,4 +2,5 @@ include requirements.txt
 graft photostore/migrations
 graft photostore/static
 graft photostore/templates
+graft photostore/store/templates
 global-exclude *.pyc
