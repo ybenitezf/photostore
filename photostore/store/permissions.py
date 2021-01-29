@@ -1,4 +1,4 @@
-from ..permissions import AdminRolNeed
+from photostore.permissions import AdminRolNeed
 from flask_principal import ItemNeed, Need, Permission, RoleNeed
 
 FotografoRolNeed = RoleNeed('fotografo')

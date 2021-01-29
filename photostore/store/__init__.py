@@ -1,2 +1,2 @@
-from .api import photostore_api
-from .views import bp
+from photostore.store.api import photostore_api
+from photostore.store.views import bp

@@ -1,13 +1,12 @@
-from flask import stream_with_context
-from flask import Response
-from .. import filetools, db
-from ..modules.editorjs import renderBlock
-from ..permissions import admin_perm
-from .forms import PhotoDetailsForm, SearchPhotosForm
-from .models import Photo, PhotoCoverage, PhotoPaginaBusqueda
-from .utiles import StorageController
-from .permissions import EditPhotoPermission, DownloadPhotoPermission
-from .permissions import EDIT_PHOTO, DOWNLOAD_PHOTO
+from photostore import filetools, db
+from photostore.modules.editorjs import renderBlock
+from photostore.permissions import admin_perm
+from photostore.store.forms import PhotoDetailsForm, SearchPhotosForm
+from photostore.store.models import Photo, PhotoCoverage, PhotoPaginaBusqueda
+from photostore.store.utiles import StorageController
+from photostore.store.permissions import EditPhotoPermission
+from photostore.store.permissions import DownloadPhotoPermission
+from photostore.store.permissions import EDIT_PHOTO, DOWNLOAD_PHOTO
 from whoosh.filedb.filestore import FileStorage
 from whoosh.qparser import MultifieldParser
 from flask_login import login_required, current_user
@@ -15,6 +14,8 @@ from flask_breadcrumbs import register_breadcrumb, default_breadcrumb_root
 from flask_menu import register_menu, current_menu
 from flask import Blueprint, current_app, render_template, abort
 from flask import request, json, send_file, request, url_for
+from flask import stream_with_context
+from flask import Response
 from pathlib import Path
 from werkzeug.utils import redirect, secure_filename
 import os
@@ -28,12 +29,14 @@ default_breadcrumb_root(bp, '.')
 def can_edit_cobertura(cob: PhotoCoverage):
     return (cob.author_id == current_user.id) or admin_perm.can()
 
+
 @bp.context_processor
 def bp_context():
     def can_download(id):
         return DownloadPhotoPermission(id=id).can()
 
     return {'can_download_photo': can_download}
+
 
 @bp.before_app_first_request
 def setupMenus():
@@ -80,7 +83,7 @@ def photo_download(id):
         os.remove(file_name)
 
     return Response(
-        stream_with_context(stream_and_remove()), 
+        stream_with_context(stream_and_remove()),
         headers={
             'Content-Type': 'application/zip',
             'Content-Disposition': 'attachment; filename="{}.zip"'.format(id)
@@ -120,6 +123,7 @@ def photo_edit(id):
     return render_template(
         'store/photo_edit.html', foto=p, form=form)
 
+
 @bp.route('/')
 @register_breadcrumb(bp, '.index', 'Fotos')
 @register_menu(bp, 'navbar.photostore.index', 'Fotos')
@@ -132,7 +136,7 @@ def index():
         PhotoCoverage.archive_on.desc()).paginate(page, per_page=4)
 
     return render_template(
-        'store/index.html', coberturas=coberturas, 
+        'store/index.html', coberturas=coberturas,
         form=form, can_edit=can_edit_cobertura)
 
 
@@ -141,7 +145,7 @@ def view_editarCobertura_dlc(*args, **kwargs):
     cob = PhotoCoverage.query.get_or_404(id)
     return [
         {
-            'text': 'Editar Cobertura', 
+            'text': 'Editar Cobertura',
             'url': url_for('.editarCobertura', id=cob.id)
         }
     ]
@@ -149,7 +153,7 @@ def view_editarCobertura_dlc(*args, **kwargs):
 
 @bp.route('/editar/cobertura/<id>')
 @register_breadcrumb(
-    bp, '.index.editarCobertura', '', 
+    bp, '.index.editarCobertura', '',
     dynamic_list_constructor=view_editarCobertura_dlc)
 @login_required
 def editarCobertura(id):
@@ -159,7 +163,6 @@ def editarCobertura(id):
 
     return render_template(
         'store/editar_cobertura.html', cobertura=cobertura)
-
 
 
 @bp.route('/myphotos')
@@ -187,7 +190,7 @@ def buscar_indice():
     form = SearchPhotosForm()
     userquery = request.args.get('userquery', "")
     try:
-        page = int(request.args.get('page' , '1'))
+        page = int(request.args.get('page', '1'))
         page = page if page > 0 else 1
     except ValueError:
         page = 1
@@ -209,7 +212,7 @@ def buscar_indice():
             qp.parse(userquery), page, pagelen=9,  groupedby="keywords"))
 
     return render_template(
-        'store/search.html', 
+        'store/search.html',
         form=form, results=results,
         userquery=userquery)
 
@@ -240,7 +243,7 @@ def handle_upload():
         fullname = os.path.join(tempfile.mkdtemp(), filename)
         file.save(fullname)
         # Procesar la imagen aqui
-        # -- 
+        # --
         keywords = json.loads(request.form.get('keywords'))
         user_data = {
             'headline': request.form.get('headline'),
@@ -267,7 +270,7 @@ def handle_upload():
             return {'md5': im.md5}, 200
         else:
             return {"message": "Invalid image"}, 400
-    
+
     return {"message": "Something went worng"}, 400
 
 
@@ -276,7 +279,7 @@ def render_excerpt_to_html():
     def render_excerpt(in_data):
         data = json.loads(in_data)
         return render_template(
-            'store/editorjs/photo_excerpt.html', 
+            'store/editorjs/photo_excerpt.html',
             data=data,
             block_renderer=renderBlock)
 

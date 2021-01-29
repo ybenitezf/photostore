@@ -1,8 +1,8 @@
-from ..modules.search import index_document, index_document_async
-from ..modules.ziparchive import ZipArchive
-from .. import filetools, db, celery
-from .models import Photo, Volume
-from .schemas import PhotoIndexSchema, PhotoToEditorJSSchema
+from photostore.modules.search import index_document, index_document_async
+from photostore.modules.ziparchive import ZipArchive
+from photostore import filetools, db, celery
+from photostore.store.models import Photo, Volume
+from photostore.store.schemas import PhotoIndexSchema, PhotoToEditorJSSchema
 from PIL import Image
 from PIL.ExifTags import TAGS
 from flask import current_app
@@ -16,7 +16,7 @@ import json
 
 def getImageInfo(filename):
     """Read Image Exif Info
-    
+
     retorna dict con las llaves:
     {
         ExifImageWidth: 0
@@ -49,11 +49,13 @@ def getImageInfo(filename):
 
     return ret
 
+
 def makeThumbnail(original, destino):
     current_app.logger.debug("Haciendo tumbnail para {}".format(original))
     with Image.open(original) as im:
         im.thumbnail((360, 360), Image.ANTIALIAS)
         im.convert('RGB').save(destino, "JPEG", quality=60)
+
 
 @celery.task
 def makeThumbnailAsync(*args, **kwargs):
@@ -91,13 +93,13 @@ class StorageController(object):
 
         work_dir = tempfile.TemporaryDirectory()
         foto_file_name = os.path.join(
-                work_dir.name, "{}.{}".format(photo.md5, photo.extension))
+            work_dir.name, "{}.{}".format(photo.md5, photo.extension))
         meta_file_name = os.path.join(
-                work_dir.name, "META-{}-INFO.json".format(photo.md5))
+            work_dir.name, "META-{}-INFO.json".format(photo.md5))
         # copiar original
         shutil.copy(photo.fspath, foto_file_name)
         # dump de los metadatos de la foto
-        with open(meta_file_name,'w') as mf:
+        with open(meta_file_name, 'w') as mf:
             json.dump(PhotoToEditorJSSchema().dump(photo), mf)
 
         # ponerlo todo en un el archivo zip
@@ -112,7 +114,7 @@ class StorageController(object):
 
     def processPhoto(self, file_name, user_data):
         """Inteta procesar y almacenar en el archivo una foto
-        
+
         retorna None en caso de que no se pueda almacenar la foto
         en caso contrario una instancia de Photo
 

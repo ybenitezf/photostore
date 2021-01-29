@@ -1,7 +1,7 @@
-from ..forms import NewUserForm
-from ..models.security import User, Permission, Role
-from ..permissions import admin_perm
-from .. import db
+from photostore.forms import NewUserForm
+from photostore.models.security import User, Permission, Role
+from photostore.permissions import admin_perm
+from photostore import db
 from flask_admin.contrib.sqla import ModelView
 from flask_admin import AdminIndexView, expose
 from flask_login import current_user, login_required
@@ -9,7 +9,7 @@ from flask import url_for, redirect, request
 
 
 class MyAdminIndexView(AdminIndexView):
-    
+
     @expose('/')
     @login_required
     @admin_perm.require(http_exception=403)
@@ -51,7 +51,6 @@ class UserView(MySecureModelView):
             else:
                 return redirect(url_for('user.index_view'))
 
-
         return self.render('users/create_user.html', form=form)
 
 
@@ -66,4 +65,3 @@ class PermissionView(MySecureModelView):
 
     def __init__(self):
         super().__init__(Permission, db.session, category='Securiry')
-

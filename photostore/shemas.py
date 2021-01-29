@@ -1,7 +1,6 @@
-from . import ma
-from .models.security import User
-from .models.security import Role
-from pprint import pprint
+from photostore import ma
+from photostore.models.security import User
+from photostore.models.security import Role
 
 
 class UserSchema(ma.SQLAlchemySchema):
@@ -12,7 +11,6 @@ class UserSchema(ma.SQLAlchemySchema):
     id = ma.auto_field()
     name = ma.auto_field()
     username = ma.auto_field()
-    
 
 
 class RoleSchema(ma.SQLAlchemySchema):

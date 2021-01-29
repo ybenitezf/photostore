@@ -1,7 +1,7 @@
-from .models import PhotoCoverage, Photo
-from ..modules.editorjs import renderBlock
-from ..models.security import User
-from .. import ma
+from photostore.store.models import PhotoCoverage, Photo
+from photostore.modules.editorjs import renderBlock
+from photostore.models.security import User
+from photostore import ma
 from marshmallow import fields, post_dump
 from flask import json, current_app
 from flask import render_template

@@ -1,7 +1,6 @@
-from ..views.admin import MySecureModelView
-from .models import Volume, Media, PhotoCoverage
-from .models import Photo
-from .. import db
+from photostore.views.admin import MySecureModelView
+from photostore.store.models import Volume, Media, PhotoCoverage, Photo
+from photostore import db
 
 class VolumeAdminView(MySecureModelView):
 

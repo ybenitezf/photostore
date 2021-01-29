@@ -1,6 +1,6 @@
-from .. import login_mgr, ldap_mgr, db
-from ..models.security import User, create_user
-from ..forms import LoginForm
+from photostore import login_mgr, ldap_mgr, db
+from photostore.models.security import User, create_user
+from photostore.forms import LoginForm
 from flask_login import current_user, login_user, login_required, logout_user
 from flask_ldap3_login import AuthenticationResponseStatus
 from flask_principal import Identity, AnonymousIdentity, identity_changed
@@ -12,6 +12,7 @@ from flask import request, redirect, url_for, flash, request, session
 
 users_bp = Blueprint('users', __name__, url_prefix='/users')
 default_breadcrumb_root(users_bp, '.')
+
 
 @users_bp.before_app_first_request
 def setupMenus():
@@ -60,7 +61,7 @@ def logout_menu_item(*args, **kwargs):
 @register_menu(
     users_bp, "navbar.users.logout", '',
     dynamic_list_constructor=logout_menu_item,
-    visible_when=lambda : current_user.is_authenticated)
+    visible_when=lambda: current_user.is_authenticated)
 @register_menu(
     users_bp, "actions.users.lougout", "Salir",
     visible_when=lambda: current_user.is_authenticated)
@@ -76,7 +77,7 @@ def logout():
      # Tell Flask-Principal the user is anonymous
     current_app.logger.debug('In logout() identity_changed.send')
     identity_changed.send(
-        current_app._get_current_object(), 
+        current_app._get_current_object(),
         identity=AnonymousIdentity())
 
     return redirect(url_for('.login'))
@@ -106,8 +107,8 @@ def login():
                     user = create_user(
                         res.user_info['sAMAccountName'],
                         form.password.data,
-                        name = res.user_info.get('displayName', ''),
-                        email = res.user_info.get('mail', '')
+                        name=res.user_info.get('displayName', ''),
+                        email=res.user_info.get('mail', '')
                     )
                     db.session.add(user)
                 else:
@@ -126,11 +127,11 @@ def login():
         if user is None or not user.check_password_hash(form.password.data):
             flash('Nombre de usuario o contraseña incorrectos')
             return redirect(url_for('.login'))
-        
+
         login_user(user)
         # Tell Flask-Principal the identity changed
         identity_changed.send(
-            current_app._get_current_object(), 
+            current_app._get_current_object(),
             identity=Identity(user.id, auth_type=auth_type))
         return redirect(next or url_for('photos.index'))
 

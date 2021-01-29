@@ -1,5 +1,5 @@
-from .. import db, cache
-from . import _gen_uuid
+from photostore import db
+from photostore.models import _gen_uuid
 from flask_login import UserMixin, current_user
 from flask_principal import Need, identity_loaded, RoleNeed, UserNeed, ItemNeed
 from werkzeug.security import generate_password_hash, check_password_hash

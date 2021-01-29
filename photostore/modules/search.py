@@ -1,4 +1,4 @@
-from .. import celery, db
+from photostore import celery, db
 from whoosh.searching import Hit, ResultsPage
 from whoosh.filedb.filestore import FileStorage
 from flask import current_app

@@ -1,7 +1,7 @@
 import shutil
-from .. import db
-from ..models import _gen_uuid
-from ..modules.search import PaginaBusqueda
+from photostore import db
+from photostore.models import _gen_uuid
+from photostore.modules.search import PaginaBusqueda
 from sqlalchemy.ext.hybrid import hybrid_property, Comparator
 from flask import current_app
 from PIL import Image
@@ -12,14 +12,16 @@ import os
 import logging
 
 
-DEFAULT_VOL_SIZE = lambda: current_app.config.get('DEFAULT_VOL_SIZE')
-DEFAULT_MEDIA_SIZE = lambda: current_app.config.get('DEFAULT_MEDIA_SIZE')
+def DEFAULT_VOL_SIZE(): return current_app.config.get('DEFAULT_VOL_SIZE')
+def DEFAULT_MEDIA_SIZE(): return current_app.config.get('DEFAULT_MEDIA_SIZE')
+
 
 FORMATOS_FECHA = [
     '%Y:%m:%d %H:%M:%S',
     '%Y.%m.%d %H.%M.%S',
     '%Y-%m-%dT%H:%M:%S',
 ]
+
 
 def probar_fecha(valor, formatos=FORMATOS_FECHA) -> datetime:
     fecha = None
@@ -61,12 +63,10 @@ class Volume(db.Model):
     is_full = db.Column(db.Boolean, default=False)
     medias = db.relationship('Media', backref='volume', lazy=True)
 
-    
     def testPath(self) -> bool:
         my_path = Path(self.fspath)
 
         return my_path.exists() and my_path.is_dir()
-
 
     def storePhoto(
             self, file_name, md5, user_data, size, exif=None) -> 'Photo':
@@ -164,6 +164,7 @@ class Volume(db.Model):
         # no se encontro ninguno
         return None
 
+
 class Media(db.Model):
     """A media to store photos, normally a DVD"""
 
@@ -175,9 +176,8 @@ class Media(db.Model):
     is_full = db.Column(db.Boolean, default=False)
     is_burned = db.Column(db.Boolean, default=False)
     volume_id = db.Column(db.Integer, db.ForeignKey('volume.id'),
-        nullable=False)
+                          nullable=False)
     photos = db.relationship('Photo', backref='media', lazy=True)
-
 
     def storePhoto(
             self, file_name, md5, user_data, size, exif=None) -> 'Photo':
@@ -279,7 +279,7 @@ class Photo(db.Model):
         db.String(32), db.ForeignKey('user.id'), nullable=True)
     uploader = db.relationship('User', lazy=True)
     media_id = db.Column(db.Integer, db.ForeignKey('media.id'),
-        nullable=False)
+                         nullable=False)
     credit_line = db.Column(db.String(160), default='')
     excerpt = db.Column(db.Text(), default='')
     headline = db.Column(db.String(512), default='')
@@ -308,7 +308,6 @@ class Photo(db.Model):
             self._kws = '|'.join(value)
         else:
             self._kws = ''
-
 
     @keywords.comparator
     def keywords(cls):
@@ -341,7 +340,6 @@ class PhotoCoverage(db.Model):
         else:
             self._kws = ''
 
-
     @keywords.comparator
     def keywords(cls):
         return IsInComparator(cls._kws)
@@ -354,7 +352,7 @@ class PhotoPaginaBusqueda(PaginaBusqueda):
 
     def getObjectIdentifier(self) -> 'str':
         """Atributo en los resultados que identifica al objeto
-        
+
         Para poder ser usando en getObjectsFromResults
         """
         return 'md5'

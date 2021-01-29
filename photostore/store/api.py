@@ -1,7 +1,7 @@
-from .. import db, ma
-from .utiles import StorageController
-from .schemas import PhotoCoverageSchema
-from .models import Photo, PhotoCoverage
+from photostore import db, ma
+from photostore.store.utiles import StorageController
+from photostore.store.schemas import PhotoCoverageSchema
+from photostore.store.models import Photo, PhotoCoverage
 from apifairy import arguments, body, response, other_responses
 from flask_login import login_required, current_user
 from flask import Blueprint, abort, jsonify
