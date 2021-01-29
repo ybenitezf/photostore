@@ -45,6 +45,7 @@ class Config(object):
 class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/testdb.db'
+    WTF_CSRF_ENABLED = False
 
 class ProductionConfig(Config):
     ENV = 'production'

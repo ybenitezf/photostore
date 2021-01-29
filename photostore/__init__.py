@@ -5,7 +5,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_ldap3_login import LDAP3LoginManager
-from flask_admin import Admin
 from flask_principal import Principal
 from flask_caching import Cache
 from flask_static_digest import FlaskStaticDigest
@@ -24,7 +23,6 @@ db = SQLAlchemy()
 migrate = Migrate()
 login_mgr = LoginManager()
 ldap_mgr = LDAP3LoginManager()
-admon = Admin()
 principal = Principal()
 cache = Cache()
 flask_statics = FlaskStaticDigest()
@@ -83,35 +81,22 @@ def create_app(config='photostore.config.Config'):
     apifairy.init_app(app)
     if app.config.get('CELERY_ENABLED'):
         init_celery(celery, app)
+    login_mgr.login_view = 'users.login'
 
     from photostore.views.users import users_bp
     from photostore.searchcommands import cmd as search_cmd
     from photostore.admin_commands import users_cmds
-    from photostore.views.admin import MyAdminIndexView, UserView
-    from photostore.views.admin import RoleView, PermissionView
     from photostore.store.views import bp
     from photostore.store import photostore_api
-    from photostore.store.admin import VolumeAdminView
-    from photostore.store.admin import MediaAdminView
-    from photostore.store.admin import PhotoCoverageAdminView
-    from photostore.store.admin import PhotoAdminView
 
-    admon.init_app(app, index_view=MyAdminIndexView())
     # registrar los blueprints
     app.register_blueprint(users_bp)
     app.register_blueprint(search_cmd)
     app.register_blueprint(users_cmds)
     app.register_blueprint(deploy_cmd)
-    login_mgr.login_view = 'users.login'
-
-    # admon views
-    admon.add_views(UserView(), RoleView(), PermissionView())
     app.register_blueprint(bp)
     app.register_blueprint(
         photostore_api, url_prefix='/api')
-    admon.add_views(
-        VolumeAdminView(), MediaAdminView(), PhotoCoverageAdminView(),
-        PhotoAdminView())
     # the dummy thing
 
     @app.route("/")

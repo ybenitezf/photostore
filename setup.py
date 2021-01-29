@@ -33,7 +33,6 @@ setup(
         'Flask-SQLAlchemy',
         'Flask-Login',
         'Flask-WTF',
-        'Flask-Admin',
         'flask-ldap3-login',
         'Flask-Breadcrumbs',
         'Flask-Menu',
