@@ -87,6 +87,19 @@ class StorageController(object):
         else:
             index_document(base / 'photos', s.dump(photo))
 
+    def generateThumbnail(self, photo: Photo):
+        # agregamos a la base de datos la información
+        thumb_dst = os.path.join(
+            current_app.config['UPLOAD_FOLDER'], 'thumb_{}{}'.format(
+                photo.md5, '.jpg'))
+        if current_app.config.get('CELERY_ENABLED'):
+            makeThumbnailAsync.delay(photo.fspath, thumb_dst)
+        else:
+            makeThumbnail(photo.fspath, thumb_dst)
+        photo.thumbnail = thumb_dst
+        db.session.add(photo)
+        db.session.commit()
+
     def makePhotoZip(self, photo: Photo) -> 'str':
         with tempfile.NamedTemporaryFile(delete=True) as f:
             archive_name = f.name
@@ -151,18 +164,9 @@ class StorageController(object):
                 file_name, md5, user_data, bts, exif=img_info)
             self.cleanUpFile(file_name)
             if photo is not None:
-                # agregamos a la base de datos la información
-                thumb_dst = os.path.join(
-                    current_app.config['UPLOAD_FOLDER'], 'thumb_{}{}'.format(
-                        md5, '.jpg'))
-                if current_app.config.get('CELERY_ENABLED'):
-                    makeThumbnailAsync.delay(photo.fspath, thumb_dst)
-                else:
-                    makeThumbnail(photo.fspath, thumb_dst)
-                photo.thumbnail = thumb_dst
+                # make thumbnails and index for search
+                self.generateThumbnail(photo)
                 self.indexPhoto(photo)
-                db.session.add(vol)
-                db.session.add(photo)
             return photo
 
         _l.debug("No se encontro un volumen para almacenar la foto")

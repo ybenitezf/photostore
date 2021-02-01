@@ -55,6 +55,10 @@ def setupMenus():
 @bp.route('/photo/preview/<id>')
 def photo_thumbnail(id):
     p = Photo.query.get_or_404(id)
+    if Path(p.thumbnail).is_file() is False:
+        # this is slow but ensure the thumbnail is there in the next load
+        StorageController.getInstance().generateThumbnail(p)
+        abort(404)
     return send_file(p.thumbnail)
 
 
