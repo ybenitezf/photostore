@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+
+{% block page_title %}Admin - Modelos{% endblock %}
+
+
+{% block breadcrumb %}
+<nav class="px-3">
+    <div class="nav-wrapper">
+        <a href="{{ url_for('photos.index') }}" class="breadcrumb">Inicio</a>
+        <a href="{{ url_for('admin_bp.admin_view') }}" class="breadcrumb">Modelos</a>
+    </div>
+</nav>
+{% endblock %}
+
+
+{% block content %}
+<h1>Model list</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Modelo</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr>
+            <td>
+                <a href="{{ url_for('volume_bp.index') }}">Volumenes</a>
+            </td>
+            <td>
+                <a href="{{ url_for('volume_bp.create') }}" class="waves-effect waves-light btn"><i class="material-icons">add</i></a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+{% endblock content %}

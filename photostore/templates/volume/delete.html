@@ -1,0 +1,57 @@
+{% extends 'layout.html' %}
+
+{% block page_title %}Admin - Eliminar Volumen{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <form action="" method="POST" class="col s12">
+            {{ form.hidden_tag() }}
+            <h2>Eliminar Volumen</h2>
+            <div class="row">
+                <div class="col s12 input-field">
+                    {{ form.name.label }}
+                    {{ form.name }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12 input-field">
+                    {{ form.fspath.label }}
+                    {{ form.fspath }}
+                    <span class="helper-text">
+                        El directorio no se eliminará
+                    </span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <button class="btn waves-effect waves-light red darken-3" type="submit" name="action">
+                        ¿Eliminar el volumen?
+                        <i class="material-icons left">delete</i>
+                    </button>
+
+                    <a href="{{ url_for('volume_bp.index') }}" class="btn waves-effect waves-light">
+                        Cancelar
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block breadcrumb %}
+<nav class="px-3">
+    <div class="nav-wrapper">
+        <a href="{{ url_for('photos.index') }}" class="breadcrumb">Inicio</a>
+        <a href="{{ url_for('admin_bp.admin_view') }}" class="breadcrumb">Modelos</a>
+        <a href="{{ url_for('volume_bp.index') }}" class="breadcrumb">Volumenes</a>
+        <a href="{{ url_for('volume_bp.create') }}" class="breadcrumb">Eliminar</a>
+    </div>
+</nav>
+{% endblock %}
+
+

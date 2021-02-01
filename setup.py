@@ -39,6 +39,7 @@ setup(
         'Flask-Principal',
         'Flask-Caching',
         'Flask-Static-Digest',
+        'Flask-Diced',
         'email-validator',
         'PyMySQL',
         'python-dotenv',

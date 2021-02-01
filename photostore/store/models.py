@@ -1,8 +1,8 @@
-import shutil
 from photostore import db
 from photostore.models import _gen_uuid
 from photostore.modules.search import PaginaBusqueda
 from sqlalchemy.ext.hybrid import hybrid_property, Comparator
+from flask_diced import persistence_methods
 from flask import current_app
 from PIL import Image
 from iptcinfo3 import IPTCInfo
@@ -10,6 +10,7 @@ from pathlib import Path
 from datetime import datetime
 import os
 import logging
+import shutil
 
 
 def DEFAULT_VOL_SIZE(): return current_app.config.get('DEFAULT_VOL_SIZE')
@@ -52,6 +53,7 @@ class IsInComparator(Comparator):
         return self.__clause_element__().contains(other)
 
 
+@persistence_methods(db)
 class Volume(db.Model):
     """A Volume to store photos"""
 
