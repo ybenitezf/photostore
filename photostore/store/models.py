@@ -89,6 +89,8 @@ class Volume(db.Model):
             # actualizar la capacidad ocupada
             self.used += size
             self.query.session.add(self)
+            db.session.add(self)
+            db.session.commit()
 
         return photo
 
@@ -116,15 +118,15 @@ class Volume(db.Model):
         if capacity is None:
             raise NewMediaError
 
-        sess = Media.query.session
         m = Media(volume_id=self.id, capacity=capacity)
-        sess.add(m)
-        sess.flush()
+        db.session.add(m)
+        db.session.commit()
         m.name = "MEDIA{}".format(m.id)
         m_fspath = os.path.join(self.fspath, m.name)
         Path(m_fspath).mkdir(parents=True, exist_ok=True)
         m.fspath = m_fspath
-        sess.add(m)
+        db.session.add(m)
+        db.session.commit()
 
         return m
 
@@ -245,8 +247,9 @@ class Media(db.Model):
             "Updating {}.used from {} to {}".format(
                 self.name, self.used, self.used + size))
         self.used = self.used + size
-        Media.query.session.add(self)
-        Media.query.session.add(photo)
+        db.session.add(self)
+        db.session.add(photo)
+        db.session.commit()
 
         return photo
 
