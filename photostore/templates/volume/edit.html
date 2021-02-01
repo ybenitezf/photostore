@@ -1,0 +1,80 @@
+{% extends 'layout.html' %}
+
+{% block page_title %}Admin - Editar Volumen {{ volume.name }}{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <form action="" method="POST" class="col s12">
+            {{ form.hidden_tag() }}
+            <h2>Crear volumen</h2>
+            <div class="row">
+                <div class="col s12 input-field">
+                    {{ form.name.label }}
+                    {{ form.name }}
+                    {% for error in form.name.errors %}
+                    <p class="error-message">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12 input-field">
+                    {{ form.capacity.label }}
+                    {{ form.capacity }}
+                    {% for error in form.capacity.errors %}
+                    <p class="error-message">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12 input-field">
+                    {{ form.fspath.label }}
+                    {{ form.fspath }}
+                    {% for error in form.fspath.errors %}
+                    <p class="error-message">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12 input-field">
+                    <div class="switch">
+                        <label>
+                            {{ form.is_full }}
+                            <span class="lever"></span>
+                            {{ form.is_full.label.text }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <button class="btn waves-effect waves-light" type="submit" name="action">
+                        Guardar volumen
+                        <i class="material-icons left">send</i>
+                    </button>
+
+                    <a href="{{ url_for('volume_bp.index') }}" class="btn waves-effect waves-light">
+                        Cancelar
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block breadcrumb %}
+<nav class="px-3">
+    <div class="nav-wrapper">
+        <a href="{{ url_for('photos.index') }}" class="breadcrumb">Inicio</a>
+        <a href="{{ url_for('admin_bp.admin_view') }}" class="breadcrumb">Modelos</a>
+        <a href="{{ url_for('volume_bp.index') }}" class="breadcrumb">Volumenes</a>
+        <a href="{{ url_for('volume_bp.create') }}" class="breadcrumb">Editar {{ volume.name }}</a>
+    </div>
+</nav>
+{% endblock %}
+
+

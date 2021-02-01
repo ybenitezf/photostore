@@ -1,0 +1,63 @@
+{% extends 'layout.html' %}
+
+{% block page_title %}Admin - Volumenes{% endblock %}
+
+{% block content %}
+    <h3>Volumenes</h3>
+    <a href="{{ url_for('volume_bp.create') }}" class="waves-effect waves-light btn">
+        <i class="material-icons left">add</i> 
+        Crear volumen
+    </a>
+    <div class="row">
+        <table class="col s12">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Capacidad</th>
+                    <th>Usado</th>
+                    <th>Lleno</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for v in volume_list: %}
+                <tr>
+                    <td>{{ v.name }}</td>
+                    <td>{{ v.capacity }}</td>
+                    <td>{{ v.used }}</td>
+                    <td>
+                        <div class="switch">
+                            <label>
+                                <input type="checkbox" disabled {{ 'checked' if v.is_full else '' }}>
+                                <span class="lever"></span>
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('volume_bp.edit', pk=v.id) }}" class="waves-effect waves-light btn-small">
+                            <i class="material-icons">edit</i>
+                        </a>
+                    
+                        <a href="{{ url_for('volume_bp.delete', pk=v.id) }}" class="waves-effect waves-light btn-small red darken-3">
+                            <i class="material-icons">delete</i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}
+
+
+{% block breadcrumb %}
+<nav class="px-3">
+    <div class="nav-wrapper">
+        <a href="{{ url_for('photos.index') }}" class="breadcrumb">Inicio</a>
+        <a href="{{ url_for('admin_bp.admin_view') }}" class="breadcrumb">Modelos</a>
+        <a href="{{ url_for('volume_bp.index') }}" class="breadcrumb">Volumenes</a>
+    </div>
+</nav>
+{% endblock %}
