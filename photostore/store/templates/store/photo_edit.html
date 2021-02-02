@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 
+{% block page_title %}Editar foto{% endblock %}
 
 {% block content %}
 <form action="{{ url_for('.photo_edit', id=foto.md5) }}" method="POST" data-controller='PhotoEditForm' data-action="submit->PhotoEditForm#onSubmit">
