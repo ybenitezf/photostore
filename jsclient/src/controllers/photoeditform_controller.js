@@ -1,8 +1,6 @@
-import { Application, Controller } from "stimulus";
-import ChipsController from "./controllers/chips_controller";
-import EditorExcerptController from "./controllers/excerptEditor";
+import { Controller } from "stimulus";
 
-class PhotoEditForm extends Controller {
+export default class extends Controller {
 
     static targets = ["submit", "excerpt", "chips"]
 
@@ -43,7 +41,3 @@ class PhotoEditForm extends Controller {
 
 }
 
-const application = Application.start();
-application.register('chips', ChipsController);
-application.register('editor', EditorExcerptController);
-application.register('PhotoEditForm', PhotoEditForm);
