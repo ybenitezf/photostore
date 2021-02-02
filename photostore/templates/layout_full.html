@@ -47,6 +47,14 @@
   </header>
   <main>
 
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+        <div class="hide" data-controller="flash">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
     <!-- main section -->
     <div class="row mt-3">
       <div class="col s12">
