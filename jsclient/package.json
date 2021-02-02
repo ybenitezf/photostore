@@ -28,6 +28,8 @@
     "@editorjs/warning": "file:warning",
     "babel-loader": "^8.1.0",
     "css-loader": "^5.0.1",
+    "html-webpack-plugin": "^4.5.1",
+    "html-webpack-template": "^6.2.0",
     "path": "^0.12.7",
     "style-loader": "^2.0.0",
     "webpack": "^4.42.1",
