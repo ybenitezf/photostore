@@ -147,6 +147,11 @@ node_modules/
 jsclient/editorjs_link
 jsclient/image
 jsclient/warning
+photostore/static/js/vendor*.js
+photostore/static/js/app.js
+photostore/static/js/runtime.js
+photostore/templates/jsfiles.html
+# flask digest
 *-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].*
 *.gz
 cache_manifest.json
