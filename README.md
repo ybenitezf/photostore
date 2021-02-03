@@ -14,6 +14,8 @@ python3 -m venv env
 make dev
 ```
 
+And run database migrations `flask db upgrade -d photostore/migrations` or `flask deploy db-upgrade`
+
 ## tests
 
 ```bash

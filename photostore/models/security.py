@@ -1,6 +1,7 @@
 from photostore import db
 from photostore.models import _gen_uuid
 from flask_login import UserMixin, current_user
+from flask_diced import persistence_methods
 from flask_principal import Need, identity_loaded, RoleNeed, UserNeed, ItemNeed
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -75,11 +76,13 @@ class Permission(db.Model):
         return "::".join([self.name, self.model_name, self.record_id])
 
 
+@persistence_methods(db)
 class User(UserMixin, db.Model):
     id = db.Column(db.String(32), primary_key=True, default=_gen_uuid)
     name = db.Column(db.String(120))
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(254), index=True)
+    credit_line = db.Column(db.String(254))
     password_hash = db.Column(db.String(128))
     roles = db.relationship(
         'Role', secondary=user_roles, lazy='select', 
