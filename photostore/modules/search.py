@@ -1,3 +1,4 @@
+from typing import List
 from photostore import celery, db
 from whoosh.searching import Hit, ResultsPage
 from whoosh.filedb.filestore import FileStorage
@@ -49,12 +50,16 @@ class PaginaBusqueda(object):
     def getObjects(self):
         return self._objects
 
-    def _getObjectFromResult(self, hit: Hit):
+    def _getObjectFromResult(self, hit: Hit) -> db.Model:
         return self.getObjectModel().query.get(
             hit.get(self.getObjectIdentifier()))
 
-    def _getObjectsFromResults(self):
-        return [self._getObjectFromResult(r) for r in self._res]
+    def _getObjectsFromResults(self) -> List[db.Model]:
+        """Get objects from database"""
+        return list(
+            filter(
+                None, [self._getObjectFromResult(r) for r in self._res])
+        )
 
     def getObjectIdentifier(self) -> 'str':
         """Atributo en los resultados que identifica al objeto
