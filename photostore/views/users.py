@@ -1,6 +1,6 @@
 from photostore import login_mgr, ldap_mgr, db
 from photostore.models.security import User, create_user
-from photostore.forms import LoginForm
+from photostore.forms import LoginForm, ProfileForm
 from flask_login import current_user, login_user, login_required, logout_user
 from flask_ldap3_login import AuthenticationResponseStatus
 from flask_principal import Identity, AnonymousIdentity, identity_changed
@@ -40,6 +40,20 @@ def setupMenus():
 @login_required
 def show_user_profile():
     return render_template('users/profile.html', user=current_user)
+
+@users_bp.route('/profile/edit', methods=['GET', 'POST'])
+@register_breadcrumb(
+    users_bp, ".show_user_profile.edit_user_profile", "Editar perfil")
+@login_required
+def edit_user_profile():
+    obj = User.query.get(current_user.id)
+    form = ProfileForm(obj=obj)
+    if form.validate_on_submit():
+        form.populate_obj(obj)
+        obj.save()
+        flash("Perfil actualizado")
+        return redirect(url_for('.show_user_profile'))
+    return render_template('users/edit_profile.html', form=form, user=obj)
 
 
 @login_mgr.user_loader
