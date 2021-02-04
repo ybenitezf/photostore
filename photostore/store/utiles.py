@@ -101,9 +101,8 @@ class StorageController(object):
         db.session.commit()
 
     def makePhotoZip(self, photo: Photo) -> 'str':
-        with tempfile.NamedTemporaryFile(delete=True) as f:
-            archive_name = f.name
-
+        archive_name = os.path.join(
+            tempfile.gettempdir(), "{}.zip".format(photo.md5))
         work_dir = tempfile.TemporaryDirectory()
         foto_file_name = os.path.join(
             work_dir.name, "{}.{}".format(photo.md5, photo.extension))

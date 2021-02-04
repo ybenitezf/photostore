@@ -16,12 +16,6 @@
         <img src="{{ url_for('.photo_thumbnail', id=foto.md5) }}" alt="" class="responsive-img">
         <!-- toolbar -->
         <div class="mt-3">
-            <a class="waves-effect waves-light btn" 
-                data-controller="urlcopy" 
-                data-urlcopy-url-value="{{ url_for('.fakelink', id=foto.md5, ext=foto.extension, _external=True) }}"
-                data-action="click->urlcopy#copyURL">
-                <i class="material-icons">content_copy</i>
-            </a>
             {% if can_download_photo(foto.md5) %}
             <a class="waves-effect waves-light btn" href="{{ url_for('.photo_download', id=foto.md5) }}">
                 <i class="material-icons">file_download</i>

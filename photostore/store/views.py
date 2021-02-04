@@ -33,6 +33,7 @@ def can_edit_cobertura(cob: PhotoCoverage):
 @bp.context_processor
 def bp_context():
     def can_download(id):
+        """Can download original image"""
         return DownloadPhotoPermission(id=id).can()
 
     return {'can_download_photo': can_download}
@@ -62,18 +63,6 @@ def photo_thumbnail(id):
     return send_file(p.thumbnail)
 
 
-@bp.route('/photo/getimage/<id>')
-def photo_getimage(id):
-    p = Photo.query.get_or_404(id)
-    return send_file(p.fspath)
-
-
-@bp.route('/photo/fakelink/<id>/.<ext>')
-def fakelink(id, ext):
-    p = Photo.query.get_or_404(id)
-    return send_file(p.thumbnail)
-
-
 @bp.route('/photo/download/<id>')
 def photo_download(id):
     """Descargar el zip con la foto y la información de la foto"""
@@ -90,7 +79,8 @@ def photo_download(id):
         stream_with_context(stream_and_remove()),
         headers={
             'Content-Type': 'application/zip',
-            'Content-Disposition': 'attachment; filename="{}.zip"'.format(id)
+            'Content-Disposition': 'attachment; filename="{}"'.format(
+                Path(file_name).name)
         }
     )
 
