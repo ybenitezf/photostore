@@ -14,8 +14,7 @@
                 <tr>
                     <th>Nombre</th>
                     <th>Capacidad</th>
-                    <th>Usado</th>
-                    <th>Lleno</th>
+                    <th>¿Lleno?</th>
                     <th></th>
                 </tr>
             </thead>
@@ -24,8 +23,18 @@
                 {% for v in volume_list: %}
                 <tr>
                     <td>{{ v.name }}</td>
-                    <td>{{ v.capacity }}</td>
-                    <td>{{ v.used }}</td>
+                    <td>
+                        {% with per = (100*v.used) // v.capacity %}
+                        <div class="modded">
+                            <div class="progress">
+                                <span>Usado</span>
+                                <div class="determinate" style="width: {{ per }}%; animation: grow 2s;">
+                                    {{ per }}%
+                                </div>
+                            </div>
+                        </div>
+                        {% endwith %}
+                    </td>
                     <td>
                         <div class="switch">
                             <label>
