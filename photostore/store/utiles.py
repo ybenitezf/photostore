@@ -1,5 +1,5 @@
 from photostore.modules.search import index_document, index_document_async
-from photostore.modules.ziparchive import ZipArchive
+from adelacommon.ziparchive import ZipArchive
 from photostore import filetools, db, celery
 from photostore.store.models import Photo, Volume
 from photostore.store.schemas import PhotoIndexSchema, PhotoToEditorJSSchema
