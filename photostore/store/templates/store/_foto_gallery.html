@@ -9,11 +9,9 @@
                     <a class="btn-floating btn-small halfway-fab waves-effect waves-light grey activator"><i class="material-icons">more_vert</i></a>
                 </div>
                 <div class="card-action">
-                    {% if can_download_photo(foto.md5) %}
-                    <a class="waves-effect waves-light btn btn-small" href="{{ url_for('.photo_download', id=foto.md5) }}">
+                    <a class="waves-effect waves-light btn btn-small" href="{{ url_for('.photo_download_page', id=foto.md5) }}">
                         <i class="material-icons">file_download</i>
                     </a>
-                    {% endif %}
                 </div>
                 <div class="card-reveal">
                     <span class="card-title grey-text text-darken-4">{{ foto.headline }}<i class="material-icons right">close</i></span>

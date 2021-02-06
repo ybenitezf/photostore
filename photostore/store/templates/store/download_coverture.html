@@ -1,0 +1,41 @@
+{% extends 'layout.html' %}
+
+{% block page_title %}Exportar{% endblock %}
+
+{% block content %}
+<h1>Exportar: <small>{{cobertura.headline}}</small></h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col s6">
+            <div class="card-panel mt-5">
+                <p class="center-align grey-text text-darken-2">
+                    Todas las fotos preparadas para la web, 
+                    incluye marca de agua.
+                </p>
+                <p class="center-align">
+                    <!-- TODO: Download coverage for web -->
+                    <a class="waves-effect waves-light btn"><i class="material-icons left">file_download</i>Descargar para web</a>
+                </p>
+            </div>
+        </div>
+
+        <div class="col s6">
+            <div class="card-panel mt-5">
+                <p class="center-align grey-text text-darken-2">
+                    Originales de las fotos, exactamente como se 
+                    almacenaron en PhotoStore
+                </p>
+                <p class="center-align">
+                    {% if can_download_coverage(cobertura.id) %}
+                    <a  href="{{ url_for('.download_coberture_archive', id=cobertura.id) }}" class="waves-effect waves-light btn"><i class="material-icons left">file_download</i>Descargar orginales</a>
+                    {% else %}
+                    <a  class="waves-effect waves-light btn disabled"><i class="material-icons left">file_download</i>Descargar orginales</a>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+

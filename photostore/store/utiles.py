@@ -3,7 +3,7 @@ from adelacommon.ziparchive import ZipArchive
 from photostore import filetools, db, celery
 from photostore.store.models import Photo, Volume
 from photostore.store.schemas import PhotoIndexSchema, PhotoToEditorJSSchema
-from PIL import Image
+from PIL import Image, ImageFilter, ImageDraw, ImageFont
 from PIL.ExifTags import TAGS
 from flask import current_app
 from pathlib import Path
@@ -100,7 +100,91 @@ class StorageController(object):
         db.session.add(photo)
         db.session.commit()
 
-    def makePhotoZip(self, photo: Photo) -> 'str':
+    @staticmethod
+    def makeWebRendition(photo: Photo, force=False) -> str:
+        """Make a reb ready rendition of the photo"""
+        _l = current_app.logger.debug
+        # ensure path exits
+        uploads_folder = os.path.join(
+            current_app.config.get('UPLOAD_FOLDER'), 'images')
+        Path(uploads_folder).mkdir(parents=True, exist_ok=True)
+        # -- 
+
+        # Is there a previous copy
+        file_name = os.path.join(
+            uploads_folder,
+            "".join([photo.md5, Path(photo.fspath).suffix])
+        )
+        if Path(file_name).exists() and (force is False):
+            return file_name
+        else:
+            # copy original photo to workdir
+            with open(photo.fspath, mode="rb") as src:
+                    with open(file_name, mode="wb") as dst:
+                        shutil.copyfileobj(src, dst)
+            # --
+        
+        with Image.open(file_name) as im:
+            width, height = im.size
+            mode = 'cuadrada'
+            mode = 'vertical' if height > width else mode
+            mode = 'horizontal' if width > height else mode
+            water_mark = os.path.join(
+                current_app.static_folder,
+                'images', 'watermark.png')
+            escalar = False
+            if im.format in ['JPEG', 'TIFF']:
+                _l("Es JPEG/TIFF")
+                _l("La imagen es {}".format(mode))
+                if (mode in ['cuadrada', 'horizontal']) and (height > 1080):
+                    nheight = 1080
+                    hpercent = (nheight / float(height))
+                    nwidth = int((float(width) * float(hpercent)))
+                    escalar = True
+                elif (mode == 'vertical') and (width > 900):
+                    nwidth = 900
+                    wpercent = (nwidth / float(width))
+                    nheight = int((float(height) * float(wpercent)))
+                    escalar = True
+                else:
+                    nwidth, nheight = (width, height)
+                    _l("No necesita reescalado")
+
+                if escalar is True:
+                    _l("Nuevas dimensiones {}/{}".format(nwidth, nheight))
+                    im.thumbnail((nwidth, nheight), resample=Image.BICUBIC)
+                    _l("Sharpening")
+                    out = im.filter(ImageFilter.SHARPEN)
+                    # with Image.open(water_mark) as wm:
+                    #     out.paste(wm, (-25, -25), wm)
+                    text = "{} © {} Editora Adelante".format(
+                        photo.credit_line,
+                        photo.taken_on.strftime("%Y")
+                    )
+                    d = ImageDraw.Draw(out, "RGBA")
+                    fnt = ImageFont.truetype(
+                        "Pillow/Tests/fonts/FreeMono.ttf", 18)
+                    d.text(
+                        (20, nheight - 40), 
+                        text,
+                        fill=(255, 255, 255),
+                        stroke_fill=(25, 25, 25),
+                        stroke_width=2,
+                        font=fnt)
+                    out.save(
+                        file_name, format='jpeg', dpi=(72, 72),
+                        quality=95, optimize=True, progressive=True,
+                        exif=im.info.get('exif'))
+                    # out.close()
+                else:
+                    with Image.open(water_mark) as wm:
+                        im.paste(wm, (25, 25), wm)
+            else:
+                _l("formato soportado")
+                file_name = None
+        return file_name
+
+    def makePhotoZip(self, photo: Photo, web_ready=False) -> 'str':
         archive_name = os.path.join(
             tempfile.gettempdir(), "{}.zip".format(photo.md5))
         work_dir = tempfile.TemporaryDirectory()
@@ -108,8 +192,14 @@ class StorageController(object):
             work_dir.name, "{}.{}".format(photo.md5, photo.extension))
         meta_file_name = os.path.join(
             work_dir.name, "META-{}-INFO.json".format(photo.md5))
-        # copiar original
-        shutil.copy(photo.fspath, foto_file_name)
+
+        if web_ready:
+            web_rendition = self.makeWebRendition(photo)
+            shutil.copy(web_rendition, foto_file_name)
+        else:
+            # copiar original
+            shutil.copy(photo.fspath, foto_file_name)
+        
         # dump de los metadatos de la foto
         with open(meta_file_name, 'w') as mf:
             json.dump(PhotoToEditorJSSchema().dump(photo), mf)
