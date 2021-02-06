@@ -1,11 +1,13 @@
 from photostore.modules.search import index_document, index_document_async
 from adelacommon.ziparchive import ZipArchive
 from photostore import filetools, db, celery
-from photostore.store.models import Photo, Volume
-from photostore.store.schemas import PhotoIndexSchema, PhotoToEditorJSSchema
+from photostore.store.models import Photo, PhotoCoverage, Volume
+from photostore.store.schemas import PhotoIndexSchema, PhotoExportSchema
+from photostore.store.schemas import PhotoCoverageExportSchema
 from PIL import Image, ImageFilter, ImageDraw, ImageFont
 from PIL.ExifTags import TAGS
 from flask import current_app
+from slugify import slugify
 from pathlib import Path
 import tempfile
 import os
@@ -100,8 +102,7 @@ class StorageController(object):
         db.session.add(photo)
         db.session.commit()
 
-    @staticmethod
-    def makeWebRendition(photo: Photo, force=False) -> str:
+    def makeWebRendition(self, photo: Photo, force=False) -> str:
         """Make a reb ready rendition of the photo"""
         _l = current_app.logger.debug
         # ensure path exits
@@ -184,14 +185,14 @@ class StorageController(object):
                 file_name = None
         return file_name
 
-    def makePhotoZip(self, photo: Photo, web_ready=False) -> 'str':
+    def makePhotoZip(self, photo: Photo, web_ready=True) -> 'str':
         archive_name = os.path.join(
             tempfile.gettempdir(), "{}.zip".format(photo.md5))
         work_dir = tempfile.TemporaryDirectory()
         foto_file_name = os.path.join(
             work_dir.name, "{}.{}".format(photo.md5, photo.extension))
         meta_file_name = os.path.join(
-            work_dir.name, "META-{}-INFO.json".format(photo.md5))
+            work_dir.name, "META-INFO.json")
 
         if web_ready:
             web_rendition = self.makeWebRendition(photo)
@@ -202,7 +203,7 @@ class StorageController(object):
         
         # dump de los metadatos de la foto
         with open(meta_file_name, 'w') as mf:
-            json.dump(PhotoToEditorJSSchema().dump(photo), mf)
+            json.dump(PhotoExportSchema().dump(photo), mf)
 
         # ponerlo todo en un el archivo zip
         zip = ZipArchive(archive_name, 'w')
@@ -276,3 +277,34 @@ class StorageController(object):
             current_app.logger.error(
                 "Error cleaning up a file: {}".format(file_name))
         return
+
+    def exportCoverage(self, cov: PhotoCoverage, web_ready=True):
+        slug = slugify("{} {}".format(cov.id, cov.headline))
+        archive_name = os.path.join(
+            tempfile.gettempdir(), "{}.zip".format(slug))
+        work_dir = tempfile.TemporaryDirectory()
+        photo_list = list()
+
+        for p in cov.photos:
+            # make the photo zip
+            photo_archive = self.makePhotoZip(p, web_ready=web_ready)
+            photo_list.append(shutil.move(photo_archive, work_dir.name))
+            photo_list.append(shutil.copy(p.thumbnail, work_dir.name))
+
+        meta_file_name = os.path.join(
+            work_dir.name, "META-INFO.json")
+
+        # dump coverage metadata
+        with open(meta_file_name, 'w') as mf:
+            json.dump(PhotoCoverageExportSchema().dump(cov), mf)
+
+        # ponerlo todo en un el archivo zip
+        zip = ZipArchive(archive_name, 'w')
+        for foto_file_name in photo_list:
+            zip.addFile(foto_file_name, baseToRemove=work_dir.name)
+        zip.addFile(meta_file_name, baseToRemove=work_dir.name)
+        zip.close()
+
+        # # limpiar directorio temporal
+        work_dir.cleanup()
+        return archive_name

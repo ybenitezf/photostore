@@ -4,6 +4,7 @@ from photostore.permissions import admin_perm
 from photostore.store.forms import PhotoDetailsForm, SearchPhotosForm
 from photostore.store.models import Photo, PhotoCoverage, PhotoPaginaBusqueda
 from photostore.store.utiles import StorageController
+from photostore.store.permissions import DownloadCoveragePermission
 from photostore.store.permissions import EditPhotoPermission
 from photostore.store.permissions import DownloadPhotoPermission
 from photostore.store.permissions import EDIT_PHOTO, DOWNLOAD_PHOTO
@@ -36,10 +37,8 @@ def bp_context():
         """Can download original image"""
         return DownloadPhotoPermission(id=id).can()
 
-    # REVIEW: use princial Permission
     def can_download_coverage(id):
-        cov = PhotoCoverage.query.get(id)
-        return (current_user.id == cov.author_id) or admin_perm.can()
+        return DownloadCoveragePermission(id).can()
 
     return {
         'can_download_photo': can_download,
@@ -295,8 +294,29 @@ def download_coverture(id):
 @login_required
 def download_coberture_archive(id):
     """Download the coverture .zip archive"""
-    # TODO: Download the coverture .zip archive
-    return {}
+    web_ready = True if request.args.get('web') else False
+
+    if DownloadCoveragePermission(id=id).can() is False and web_ready is False:
+        abort(403)
+
+    cov = PhotoCoverage.query.get_or_404(id)
+    file_name = StorageController.getInstance().exportCoverage(
+        cov, web_ready=web_ready)
+    file_handle = open(file_name, 'rb')
+
+    def stream_and_remove():
+        yield from file_handle
+        file_handle.close()
+        os.remove(file_name)
+
+    return Response(
+        stream_with_context(stream_and_remove()),
+        headers={
+            'Content-Type': 'application/zip',
+            'Content-Disposition': 'attachment; filename="{}"'.format(
+                Path(file_name).name)
+        }
+    )
 
 
 @bp.route('/upload', methods=['POST'])

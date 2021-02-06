@@ -1,4 +1,5 @@
 from photostore.models.security import Role, User, create_user as CreateUser
+from photostore.store import models, permissions
 from photostore.shemas import UserSchema, RoleSchema
 from photostore import db
 from flask import Blueprint
@@ -7,6 +8,15 @@ import click
 
 users_cmds = Blueprint("security", __name__)
 
+
+@users_cmds.cli.command('fixpermissions')
+def fix_permissions():
+    """Fix permissions"""
+    click.echo("Fixing coverahe permissions")
+    for c in models.PhotoCoverage.query.all():
+        u = c.author
+        u.getUserRole().addPermission(
+            permissions.DOWNLOAD_COVERAGE, c.id, 'cobertura')
 
 @users_cmds.cli.command('createuser')
 @click.option('--email', default='', help='email')

@@ -14,8 +14,7 @@
                     incluye marca de agua.
                 </p>
                 <p class="center-align">
-                    <!-- TODO: Download coverage for web -->
-                    <a class="waves-effect waves-light btn"><i class="material-icons left">file_download</i>Descargar para web</a>
+                    <a href="{{ url_for('.download_coberture_archive', id=cobertura.id, web='yes') }}" class="waves-effect waves-light btn"><i class="material-icons left">file_download</i>Descargar para web</a>
                 </p>
             </div>
         </div>
