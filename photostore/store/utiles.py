@@ -184,7 +184,7 @@ class StorageController(object):
                     )
                     d = ImageDraw.Draw(out, "RGBA")
                     fnt = ImageFont.truetype(
-                        "Pillow/Tests/fonts/FreeMono.ttf", 18)
+                        current_app.config.get('WHATERMARK_FONT'), 18)
                     _l("Applying watermark")
                     d.text(
                         (20, nheight - 40), 
@@ -206,7 +206,7 @@ class StorageController(object):
                     )
                     d = ImageDraw.Draw(im, "RGBA")
                     fnt = ImageFont.truetype(
-                        "Pillow/Tests/fonts/FreeMono.ttf", 18)
+                        current_app.config.get('WHATERMARK_FONT'), 18)
                     _l("Applying watermark")
                     d.text(
                         (20, nheight - 40), 
