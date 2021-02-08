@@ -87,6 +87,7 @@ def create_app(config='photostore.config.Config'):
     from photostore.views.admin import admin_bp, volume_bp
     from photostore.searchcommands import cmd as search_cmd
     from photostore.admin_commands import users_cmds
+    from photostore.photo_commands import photos_commands
     from photostore.store.views import bp
     from photostore.store import photostore_api
 
@@ -95,6 +96,7 @@ def create_app(config='photostore.config.Config'):
     app.register_blueprint(search_cmd)
     app.register_blueprint(users_cmds)
     app.register_blueprint(deploy_cmd)
+    app.register_blueprint(photos_commands)
     app.register_blueprint(bp)
     app.register_blueprint(
         photostore_api, url_prefix='/api')
