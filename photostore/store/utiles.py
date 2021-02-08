@@ -53,7 +53,7 @@ def getImageInfo(filename):
 
 
 def makeThumbnail(original, destino):
-    current_app.logger.debug("Haciendo tumbnail para {}".format(original))
+    current_app.logger.debug("Making tumbnail for {}".format(original))
     with Image.open(original) as im:
         im.thumbnail((360, 360), Image.ANTIALIAS)
         im.convert('RGB').save(destino, "JPEG", quality=60)
@@ -62,6 +62,27 @@ def makeThumbnail(original, destino):
 @celery.task
 def makeThumbnailAsync(*args, **kwargs):
     makeThumbnail(*args, **kwargs)
+
+
+@celery.task
+def _makeWebRenditionAsync(photo_id: str, force=False):
+    p = Photo.query.get(photo_id, force=force)
+    StorageController.getInstance().makeWebRendition(
+        p, force=force
+    )
+
+def makeWebRendition(photo_id: str, force=False):
+    if current_app.config.get('CELERY_ENABLED'):
+        # call async
+        current_app.logger.debug(
+            "Calling makeWebRendition Async")
+        _makeWebRenditionAsync.delay(photo_id, force=force)
+    else:
+        # call directly
+        p = Photo.query.get(photo_id)
+        StorageController.getInstance().makeWebRendition(
+            p, force=force
+        )
 
 
 class StorageController(object):
@@ -110,13 +131,14 @@ class StorageController(object):
             current_app.config.get('UPLOAD_FOLDER'), 'images')
         Path(uploads_folder).mkdir(parents=True, exist_ok=True)
         # -- 
-
+        _l("Web rendition for {}".format(photo.md5))
         # Is there a previous copy
         file_name = os.path.join(
             uploads_folder,
             "".join([photo.md5, Path(photo.fspath).suffix])
         )
         if Path(file_name).exists() and (force is False):
+            _l("Web rendition already exists")
             return file_name
         else:
             # copy original photo to workdir
@@ -156,8 +178,6 @@ class StorageController(object):
                     im.thumbnail((nwidth, nheight), resample=Image.BICUBIC)
                     _l("Sharpening")
                     out = im.filter(ImageFilter.SHARPEN)
-                    # with Image.open(water_mark) as wm:
-                    #     out.paste(wm, (-25, -25), wm)
                     text = "{} © {} Editora Adelante".format(
                         photo.credit_line,
                         photo.taken_on.strftime("%Y")
@@ -165,6 +185,7 @@ class StorageController(object):
                     d = ImageDraw.Draw(out, "RGBA")
                     fnt = ImageFont.truetype(
                         "Pillow/Tests/fonts/FreeMono.ttf", 18)
+                    _l("Applying watermark")
                     d.text(
                         (20, nheight - 40), 
                         text,
@@ -172,17 +193,39 @@ class StorageController(object):
                         stroke_fill=(25, 25, 25),
                         stroke_width=2,
                         font=fnt)
+                    _l("Saving {}".format(file_name))
                     out.save(
                         file_name, format='jpeg', dpi=(72, 72),
                         quality=95, optimize=True, progressive=True,
                         exif=im.info.get('exif'))
-                    # out.close()
                 else:
-                    with Image.open(water_mark) as wm:
-                        im.paste(wm, (25, 25), wm)
+                    _l("No modifications needed. Is it an original?")
+                    text = "{} © {} Editora Adelante".format(
+                        photo.credit_line,
+                        photo.taken_on.strftime("%Y")
+                    )
+                    d = ImageDraw.Draw(im, "RGBA")
+                    fnt = ImageFont.truetype(
+                        "Pillow/Tests/fonts/FreeMono.ttf", 18)
+                    _l("Applying watermark")
+                    d.text(
+                        (20, nheight - 40), 
+                        text,
+                        fill=(255, 255, 255),
+                        stroke_fill=(25, 25, 25),
+                        stroke_width=2,
+                        font=fnt)
+                    _l("Saving {}".format(file_name))
+                    im.save(
+                        file_name, format='jpeg', dpi=(72, 72),
+                        optimize=True, progressive=True)
             else:
-                _l("formato soportado")
+                _l("unsupported format")
                 file_name = None
+
+        if file_name is None:
+            _l("Cleaning up unsupported format")
+            os.remove(file_name)
         return file_name
 
     def makePhotoZip(self, photo: Photo, web_ready=True) -> 'str':
@@ -257,6 +300,7 @@ class StorageController(object):
                 # make thumbnails and index for search
                 self.generateThumbnail(photo)
                 self.indexPhoto(photo)
+                makeWebRendition(photo.md5)
             return photo
 
         _l.debug("No se encontro un volumen para almacenar la foto")
