@@ -12,7 +12,7 @@ users_cmds = Blueprint("security", __name__)
 @users_cmds.cli.command('fixpermissions')
 def fix_permissions():
     """Fix permissions"""
-    click.echo("Fixing coverahe permissions")
+    click.echo("Fixing coverage permissions")
     for c in models.PhotoCoverage.query.all():
         u = c.author
         u.getUserRole().addPermission(
