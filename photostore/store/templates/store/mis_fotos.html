@@ -1,5 +1,7 @@
 {% extends 'layout_full.html' %}
 
+{% block page_title %}Mis fotos{% endblock %}
+
 {% block content %}
 <div class="row">
     <form action="{{ url_for('.buscar_indice') }}" method="POST" class="col s12 px-5">
@@ -52,6 +54,4 @@
 </div>
 {% endblock %}
 
-{% block page_js %}
-<script src="{{ static_url_for('static', filename='js/myphotospage.js') }}"></script>
-{% endblock %}
+

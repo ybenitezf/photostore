@@ -4,6 +4,7 @@ from photostore.permissions import admin_perm
 from photostore.store.forms import PhotoDetailsForm, SearchPhotosForm
 from photostore.store.models import Photo, PhotoCoverage, PhotoPaginaBusqueda
 from photostore.store.utiles import StorageController
+from photostore.store.permissions import DownloadCoveragePermission
 from photostore.store.permissions import EditPhotoPermission
 from photostore.store.permissions import DownloadPhotoPermission
 from photostore.store.permissions import EDIT_PHOTO, DOWNLOAD_PHOTO
@@ -23,7 +24,7 @@ import tempfile
 
 bp = Blueprint(
     'photos', __name__, template_folder='templates')
-default_breadcrumb_root(bp, '.')
+default_breadcrumb_root(bp, '.index')
 
 
 def can_edit_cobertura(cob: PhotoCoverage):
@@ -33,9 +34,16 @@ def can_edit_cobertura(cob: PhotoCoverage):
 @bp.context_processor
 def bp_context():
     def can_download(id):
+        """Can download original image"""
         return DownloadPhotoPermission(id=id).can()
 
-    return {'can_download_photo': can_download}
+    def can_download_coverage(id):
+        return DownloadCoveragePermission(id).can()
+
+    return {
+        'can_download_photo': can_download,
+        'can_download_coverage': can_download_coverage
+    }
 
 
 @bp.before_app_first_request
@@ -62,23 +70,16 @@ def photo_thumbnail(id):
     return send_file(p.thumbnail)
 
 
-@bp.route('/photo/getimage/<id>')
-def photo_getimage(id):
-    p = Photo.query.get_or_404(id)
-    return send_file(p.fspath)
-
-
-@bp.route('/photo/fakelink/<id>/.<ext>')
-def fakelink(id, ext):
-    p = Photo.query.get_or_404(id)
-    return send_file(p.thumbnail)
-
-
-@bp.route('/photo/download/<id>')
+@bp.route('/photo/download/archive/<id>')
+@login_required
 def photo_download(id):
     """Descargar el zip con la foto y la información de la foto"""
+    web_ready = True if request.args.get('web') else False
+    if DownloadPhotoPermission(id=id).can() is False and web_ready is False:
+        abort(403)
     p = Photo.query.get_or_404(id)
-    file_name = StorageController.getInstance().makePhotoZip(p)
+    file_name = StorageController.getInstance().makePhotoZip(
+        p, web_ready=web_ready)
     file_handle = open(file_name, 'rb')
 
     def stream_and_remove():
@@ -90,13 +91,50 @@ def photo_download(id):
         stream_with_context(stream_and_remove()),
         headers={
             'Content-Type': 'application/zip',
-            'Content-Disposition': 'attachment; filename="{}.zip"'.format(id)
+            'Content-Disposition': 'attachment; filename="{}"'.format(
+                Path(file_name).name)
         }
     )
 
 
+def view_photo_download_page_dlc(*args, **kwargs):
+    id = request.view_args['id']
+    return [
+        {
+            'text': 'Exportar',
+            'url': url_for('.photo_download_page', id=id)
+        }
+    ]
+
+
+@bp.route('/photo/download/<id>')
+@register_breadcrumb(
+    bp, '.index.photo_download_page', '',
+    dynamic_list_constructor=view_photo_download_page_dlc)
+@login_required
+def photo_download_page(id):
+    """Present page with export options"""
+    photo = Photo.query.get_or_404(id)
+    return render_template(
+        'store/photo_download_page.html',
+        foto=photo)
+
+
+def view_photo_details_dlc(*args, **kwargs):
+    id = request.view_args['id']
+    return [
+        {
+            'text': 'Detalles',
+            'url': url_for('.photo_details', id=id)
+        }
+    ]
+
+
 @bp.route('/photo/details/<id>')
-@register_breadcrumb(bp, '.index.id', 'Detalles')
+@register_breadcrumb(
+    bp, '.index.photo_details.id', 'Detalles',
+    dynamic_list_constructor=view_photo_details_dlc)
+@login_required
 def photo_details(id):
     p = Photo.query.get_or_404(id)
     can_edit = EditPhotoPermission(p.md5)
@@ -105,7 +143,7 @@ def photo_details(id):
 
 
 @bp.route('/photo/edit/<id>', methods=['GET', 'POST'])
-@register_breadcrumb(bp, '.index.id', 'Editar datos de la foto')
+@register_breadcrumb(bp, '.index.photo_edit.id', 'Editar datos de la foto')
 def photo_edit(id):
     p = Photo.query.get_or_404(id)
     can_edit = EditPhotoPermission(p.md5)
@@ -228,6 +266,57 @@ def buscar_indice():
 @login_required
 def upload_coverture():
     return render_template('store/upload.html')
+
+
+def view_download_coverture_dlc(*args, **kwargs):
+    id = request.view_args['id']
+    cob = PhotoCoverage.query.get_or_404(id)
+    return [
+        {
+            'text': 'Exportar',
+            'url': url_for('.download_coverture', id=cob.id)
+        }
+    ]
+
+
+@bp.route('/exportar/cobertura/<id>')
+@register_breadcrumb(
+    bp, '.index.download_coverture', '',
+    dynamic_list_constructor=view_download_coverture_dlc)
+@login_required
+def download_coverture(id):
+    cobertura = PhotoCoverage.query.get_or_404(id)
+    return render_template(
+        'store/download_coverture.html', cobertura=cobertura)
+
+
+@bp.route('/exportar/cobertura/archive/<id>')
+@login_required
+def download_coberture_archive(id):
+    """Download the coverture .zip archive"""
+    web_ready = True if request.args.get('web') else False
+
+    if DownloadCoveragePermission(id=id).can() is False and web_ready is False:
+        abort(403)
+
+    cov = PhotoCoverage.query.get_or_404(id)
+    file_name = StorageController.getInstance().exportCoverage(
+        cov, web_ready=web_ready)
+    file_handle = open(file_name, 'rb')
+
+    def stream_and_remove():
+        yield from file_handle
+        file_handle.close()
+        os.remove(file_name)
+
+    return Response(
+        stream_with_context(stream_and_remove()),
+        headers={
+            'Content-Type': 'application/zip',
+            'Content-Disposition': 'attachment; filename="{}"'.format(
+                Path(file_name).name)
+        }
+    )
 
 
 @bp.route('/upload', methods=['POST'])

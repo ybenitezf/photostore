@@ -2,6 +2,7 @@ from photostore import db, ma
 from photostore.store.utiles import StorageController
 from photostore.store.schemas import PhotoCoverageSchema
 from photostore.store.models import Photo, PhotoCoverage
+from photostore.store.permissions import DOWNLOAD_COVERAGE
 from apifairy import arguments, body, response, other_responses
 from flask_login import login_required, current_user
 from flask import Blueprint, abort, jsonify
@@ -73,6 +74,8 @@ def create_coverage(data):
         pc.photos.append(photo)
     db.session.add(pc)
     db.session.commit()
+    current_user.getUserRole().addPermission(
+        DOWNLOAD_COVERAGE, pc.id, 'cobertura')
     return pc
 
 @photostore_api.route('/v1/photocoverage/<id>')

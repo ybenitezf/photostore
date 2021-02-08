@@ -1,30 +1,18 @@
 {% extends "layout.html" %}
 
 
-{% block page_title %}Detalles de la foto{% endblock %}
+{% block page_title %}Descargar foto{% endblock %}
 
 {% block content %}
+
 <div class="row">
-    <div class="col s12">
-        <h1 class="headline">
-            {{ foto.headline }}
-        </h1>
-    </div>
-</div>
-<div class="row">
-    <div class="col s4">
-        <img src="{{ url_for('.photo_thumbnail', id=foto.md5) }}" alt="" class="responsive-img">
-        <!-- toolbar -->
-        <div class="mt-3">
-            <a class="waves-effect waves-light btn" href="{{ url_for('.photo_download_page', id=foto.md5) }}">
-                <i class="material-icons">file_download</i>
-            </a>
-            {% if can_edit %}
-            <a href="{{ url_for('.photo_edit', id=foto.md5) }}" class="waves-effect waves-light btn"><i class="material-icons">edit</i></a>
-            {% endif %}
-        </div>
-    </div>
-    <div class="col s8">
+    <div class="col s6">
+        <!-- foto details -->
+
+        <h4>{{ foto.headline }}</h4>
+        <p class="center-align">
+            <img src="{{ url_for('.photo_thumbnail', id=foto.md5) }}" alt="" class="responsive-img">
+        </p>
         <div class="photocoverage-excerpt">
             {{ render_excerpt(foto.excerpt)|safe }}
         </div>
@@ -34,6 +22,7 @@
             <div class="chip">{{ k }}</div>
             {% endfor %}
         </div>
+
         <div class="row">
             <div class="col s6">
                 <p><i class="material-icons left">person</i> {{ foto.taken_by }}</p>
@@ -54,10 +43,37 @@
                 {% if foto.isovalue %}<div class="exiftag"><i class="exificon material-icons">iso</i> {{foto.isovalue}}</div>{% endif %}
                 {% if foto.software %}<div class="exiftag"><i class="exificon material-icons">brush</i> {{foto.software}}</div>{% endif %}
                 {% if foto.image_width and foto.image_height %}<div class="exiftag"><i class="exificon material-icons">crop</i> {{foto.image_width}} x {{foto.image_height}}</div>{% endif %}
-                <!-- en opcionales -->
+                <!-- END: opcionales -->
             </div>
+        </div>
+        <!-- END: foto details -->
+    </div>
+
+    <div class="col s6">
+        <!-- export options -->
+        <div class="card-panel mt-5">
+            <p class="center-align grey-text text-darken-2">
+                Preparada para la web, incluye marca de agua.
+            </p>
+            <p class="center-align">
+                <a href="{{ url_for('.photo_download', id=foto.md5, web='true') }}" class="waves-effect waves-light btn"><i class="material-icons left">file_download</i>Descargar para web</a>
+            </p>
+        </div>
+
+        <div class="card-panel">
+            <p class="center-align grey-text text-darken-2">
+                Original de la foto, exactamente como se almaceno en PhotoStore
+            </p>
+            <p class="center-align">
+                {% if can_download_photo(foto.md5) %}
+                <a  href="{{ url_for('.photo_download', id=foto.md5) }}" class="waves-effect waves-light btn"><i class="material-icons left">file_download</i>Descargar orginal</a>
+                {% else %}
+                <a  class="waves-effect waves-light btn disabled"><i class="material-icons left">file_download</i>Descargar orginal</a>
+                {% endif %}
+            </p>
         </div>
     </div>
 </div>
+
 {% endblock %}
 

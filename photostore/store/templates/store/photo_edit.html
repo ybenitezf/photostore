@@ -1,8 +1,9 @@
 {% extends "layout.html" %}
 
+{% block page_title %}Editar foto{% endblock %}
 
 {% block content %}
-<form action="{{ url_for('.photo_edit', id=foto.md5) }}" method="POST" data-controller='PhotoEditForm' data-action="submit->PhotoEditForm#onSubmit">
+<form action="{{ url_for('.photo_edit', id=foto.md5) }}" method="POST" data-controller='photoeditform' data-action="submit->photoeditform#onSubmit">
     <div class="row">
         <div class="col s4">
             <img src="{{ url_for('.photo_thumbnail', id=foto.md5) }}" alt="" class="responsive-img">
@@ -27,7 +28,7 @@
             <div class="row">
                 <div class="col s12 input-field" data-controller="chips" data-chips-placeholder-value="Palabras clave"
                     data-chips-secondary-value="+Palabra"
-                    data-PhotoEditForm-target="chips">
+                    data-photoeditform-target="chips">
                     <input data-chips-target="input" type="hidden" name="tags" id="f_tags"
                         value='{{ foto.keywords|tojson|safe }}'>
                     <div class="chips chips-initial" data-chips-target="view"></div>
@@ -42,7 +43,7 @@
     <div class="row">
         <div class="col s12 input-field" data-controller="editor"
             data-editor-placeholder-value="Escribe aquí una descripción de la cobertura"
-            data-PhotoEditForm-target="excerpt">
+            data-photoeditform-target="excerpt">
             <input data-editor-target="input" type="hidden" name="excerpt" id="f_excerpt" value='{{ foto.excerpt|safe }}'>
             <label for="f_excerpt" class="active">Descripción</label>
             <div id="excerpt_field" data-editor-target="editor"></div>
@@ -59,7 +60,3 @@
 </form>
 {% endblock %}
 
-
-{% block page_js %}
-<script src="{{ static_url_for('static', filename='js/photoedit_page.js') }}"></script>
-{% endblock %}

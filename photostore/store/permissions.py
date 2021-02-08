@@ -6,12 +6,16 @@ FotografoRolNeed = RoleNeed('fotografo')
 EDIT_PHOTO = 'editar_foto'
 CREATE_PHOTO = 'subir_foto'
 DOWNLOAD_PHOTO = 'descargar_foto'
-TODOS = [EDIT_PHOTO, CREATE_PHOTO, DOWNLOAD_PHOTO]
+DOWNLOAD_COVERAGE = 'descargar_cobertura'
+TODOS = [EDIT_PHOTO, CREATE_PHOTO, DOWNLOAD_PHOTO, DOWNLOAD_COVERAGE]
 
 
 # Needs sobre todas las fotos
 EditarFotosNeed = Need(EDIT_PHOTO, 'foto')
+# download original photo, general permission
 DownloadFotoNeed = Need(DOWNLOAD_PHOTO, 'foto')
+# download coverage, all coverages
+DownloadCoverageNeed = Need(DOWNLOAD_COVERAGE, 'cobertura')
 
 
 class EditPhotoPermission(Permission):
@@ -31,4 +35,14 @@ class DownloadPhotoPermission(Permission):
         needs = [AdminRolNeed, DownloadFotoNeed]
         if id is not None:
             needs.append(ItemNeed(DOWNLOAD_PHOTO, id, 'foto'))
+        super().__init__(*needs)
+
+
+class DownloadCoveragePermission(Permission):
+    """Export coverage with photo originals"""
+
+    def __init__(self, id=None):
+        needs = [AdminRolNeed, DownloadCoverageNeed]
+        if id is not None:
+            needs.append(ItemNeed(DOWNLOAD_COVERAGE, id, 'cobertura'))
         super().__init__(*needs)

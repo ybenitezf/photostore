@@ -1,6 +1,6 @@
 {% extends 'layout_full.html' %}
 
-{% block page_title %}Buscar - Almacén de fotos{% endblock %}
+{% block page_title %}Buscar{% endblock %}
 
 {% block sidebar %}
 {% if results.groups("keywords"): %}
@@ -66,6 +66,4 @@
 {% endblock content%}
 
 
-{% block page_js %}
-<script src="{{ static_url_for('static', filename='js/photosearch_page.js') }}"></script>
-{% endblock %}
+

@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 
-{% block page_title %}Coberturas - Almacén de fotos{% endblock %}
+{% block page_title %}Coberturas{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -54,11 +54,12 @@
                   </span>
               </div>
             </div>
-            {% if can_edit(item) %}
             <div class="card-action">
+            <a href="{{ url_for('.download_coverture', id=item.id) }}" class="waves-effect waves-light btn"> <i class="material-icons left">file_download</i> Descargar</a>
+            {% if can_edit(item) %}
                 <a href="{{ url_for('.editarCobertura', id=item.id) }}" class="waves-effect waves-light btn"> <i class="material-icons left">edit</i> Editar</a>
-            </div>
             {% endif %}
+            </div>
         </div>
         {% endfor %}
 
@@ -84,6 +85,3 @@
 </div>
 {% endblock content %}
 
-{% block page_js %}
-<script src="{{ static_url_for('static', filename='js/coberturaspage.js') }}"></script>
-{% endblock %}
