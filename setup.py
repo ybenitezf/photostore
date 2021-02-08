@@ -14,7 +14,7 @@ def read(fname):
 
 setup(
     name='photostore',
-    version='0.0.8',
+    version='0.0.8a',
     url='https://github.com/ybenitezf/photostore',
     license='GPL',
     author='Yoel Benítez Fonseca',
@@ -52,7 +52,8 @@ setup(
         'marshmallow-sqlalchemy',
         'celery',
         'Whoosh',
-        'adelacommon @ https://github.com/ybenitezf/adela-common/archive/v0.0.2.tar.gz'
+        'python-slugify',
+        'adelacommon @ https://github.com/ybenitezf/adela-common/releases/download/v0.0.3/adelacommon-0.0.3-py3-none-any.whl'
     ],
     classifiers=[
         'Environment :: Web Environment', 

@@ -30,8 +30,6 @@ make coverage
 
 ## Generating distribution archives
 
-Compile static files:
-
 ```bash
 make dist
 ```
@@ -43,3 +41,7 @@ REVIEW THIS
 ```bash
 pip install https://github.com/ybenitezf/photostore/archive/master.tar.gz
 ```
+
+## Admin commands
+
+- `flask security fixpermissions`: Resolve permissions issues when posible

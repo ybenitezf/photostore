@@ -54,11 +54,12 @@
                   </span>
               </div>
             </div>
-            {% if can_edit(item) %}
             <div class="card-action">
+            <a href="{{ url_for('.download_coverture', id=item.id) }}" class="waves-effect waves-light btn"> <i class="material-icons left">file_download</i> Descargar</a>
+            {% if can_edit(item) %}
                 <a href="{{ url_for('.editarCobertura', id=item.id) }}" class="waves-effect waves-light btn"> <i class="material-icons left">edit</i> Editar</a>
-            </div>
             {% endif %}
+            </div>
         </div>
         {% endfor %}
 

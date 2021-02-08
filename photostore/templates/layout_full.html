@@ -38,7 +38,9 @@
     <nav class="px-3">
       <div class="nav-wrapper">
         {% for breadcrumb in breadcrumbs %}
+        {% if breadcrumb.text != "Menu item not initialised" %}
         <a href="{{ breadcrumb.url }}" class="breadcrumb">{{ breadcrumb.text }}</a>
+        {% endif %}
         {% endfor %}
       </div>
     </nav>

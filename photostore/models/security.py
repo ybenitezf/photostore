@@ -1,3 +1,4 @@
+from flask import current_app
 from photostore import db
 from photostore.models import _gen_uuid
 from flask_login import UserMixin, current_user
@@ -40,6 +41,10 @@ class Role(db.Model):
         else:
             self.permissions.append(p)
             self.query.session.add(self)
+        current_app.logger.debug(
+            "Apply ({},{},{}) to {}".format(
+                name, record_id, model_name, self.name))
+        self.query.session.commit()
 
     @classmethod
     def getUserEspecialRole(cls, user: 'User') -> 'Role': 
