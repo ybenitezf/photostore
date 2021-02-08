@@ -137,6 +137,7 @@ class StorageController(object):
             uploads_folder,
             "".join([photo.md5, Path(photo.fspath).suffix])
         )
+        to_clean = file_name
         if Path(file_name).exists() and (force is False):
             _l("Web rendition already exists")
             return file_name
@@ -152,9 +153,6 @@ class StorageController(object):
             mode = 'cuadrada'
             mode = 'vertical' if height > width else mode
             mode = 'horizontal' if width > height else mode
-            water_mark = os.path.join(
-                current_app.static_folder,
-                'images', 'watermark.png')
             escalar = False
             if im.format in ['JPEG', 'TIFF']:
                 _l("Es JPEG/TIFF")
@@ -225,7 +223,7 @@ class StorageController(object):
 
         if file_name is None:
             _l("Cleaning up unsupported format")
-            os.remove(file_name)
+            os.remove(to_clean)
         return file_name
 
     def makePhotoZip(self, photo: Photo, web_ready=True) -> 'str':
