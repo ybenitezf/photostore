@@ -30,8 +30,6 @@ make coverage
 
 ## Generating distribution archives
 
-Compile static files:
-
 ```bash
 make dist
 ```
