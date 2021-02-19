@@ -43,7 +43,6 @@ setup(
         'email-validator',
         'PyMySQL',
         'python-dotenv',
-        'webpreview',
         'redis',
         'cryptography',
         'Pillow',
