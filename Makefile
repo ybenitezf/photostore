@@ -18,7 +18,7 @@ export PRINT_HELP_PYSCRIPT
 help:
 	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
-clean: clean-statics clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
+clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
 
 clean-statics:
 	flask digest clean
@@ -68,6 +68,7 @@ statics: ## Build statics
 	cd styles && yarn run build && cd ..
 	flask digest compile
 
-dev: clean ## setup development enviroment
+dev: ## setup development enviroment
 	python -m pip install -e .
+	@$(MAKE) -f $(THIS_FILE) clean-statics
 	@$(MAKE) -f $(THIS_FILE) statics
