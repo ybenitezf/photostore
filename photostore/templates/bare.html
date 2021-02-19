@@ -23,6 +23,8 @@
   {% endwith %}
 
   {% block content %}{% endblock %}
+
+  <p class="center-align grey-text">Versión: {{ version }}</p>
   <!--  Scripts-->
   <script src="{{ static_url_for('static', filename='js/jquery-2.1.1.min.js') }}"></script>
   <script src="{{ static_url_for('static', filename='js/materialize.min.js') }}"></script>
