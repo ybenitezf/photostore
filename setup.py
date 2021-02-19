@@ -14,7 +14,7 @@ def read(fname):
 
 setup(
     name='photostore',
-    version='0.0.9b',
+    version='0.0.9',
     url='https://github.com/ybenitezf/photostore',
     license='GPL',
     author='Yoel Benítez Fonseca',
@@ -25,7 +25,7 @@ setup(
     zip_safe=False,
     long_description=read('README.md'),
     platforms='any',
-    setup_requires=['pytest-runner'],
+    setup_requires=['pytest-runner', 'setuptools', 'wheel', 'bump2version'],
     tests_require=['pytest', 'pytest-cov'],
     install_requires=[
         'Flask',

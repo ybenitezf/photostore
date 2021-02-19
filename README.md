@@ -16,6 +16,14 @@ make dev
 
 And run database migrations `flask db upgrade -d photostore/migrations` or `flask deploy db-upgrade`
 
+After changes make a new version with:
+
+```bash
+$ bump2version patch # possible: major / minor / patch
+$ git push
+$ git push --tags
+```
+
 ## tests
 
 ```bash

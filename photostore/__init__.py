@@ -18,6 +18,10 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 import os
 import pathlib
 
+
+__version__ = '0.0.9'
+
+
 logs = LogSetup()
 db = SQLAlchemy()
 migrate = Migrate()
@@ -102,8 +106,13 @@ def create_app(config='photostore.config.Config'):
         photostore_api, url_prefix='/api')
     app.register_blueprint(admin_bp)
     app.register_blueprint(volume_bp)
-    # the dummy thing
 
+    # inject version
+    @app.context_processor
+    def inject_version():
+        return {"version": __version__}
+
+    # the dummy thing
     @app.route("/")
     @register_breadcrumb(app, '.', "Inicio")
     @register_menu(app, '.', "Inicio")
