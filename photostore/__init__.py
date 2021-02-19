@@ -19,7 +19,7 @@ import os
 import pathlib
 
 
-__version__ = '0.0.9'
+__version__ = '0.0.10'
 
 
 logs = LogSetup()
