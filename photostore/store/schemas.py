@@ -3,10 +3,9 @@ from photostore.modules.editorjs import renderBlock
 from photostore.models.security import User
 from photostore import ma
 from marshmallow import fields, post_dump
-from flask import json, current_app
+from flask import json
 from flask import render_template
-from datetime import datetime
-
+from pathlib import Path
 
 class UserSchema(ma.SQLAlchemySchema):
     class Meta:
@@ -100,9 +99,13 @@ class PhotoExportSchema(ma.SQLAlchemySchema):
     taken_by = ma.auto_field()
     uploader = fields.Nested(UserSchema)
     version = fields.Constant("Photo:v1")
+    filename = fields.Method('getFileName')
 
     def get_excerpt(self, obj: Photo):
         return json.loads(obj.excerpt)
 
     def get_keywords(self, obj: Photo):
         return obj.keywords
+
+    def getFileName(self, obj: Photo):
+        return Path(obj.fspath).name
