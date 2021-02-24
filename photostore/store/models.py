@@ -8,6 +8,7 @@ from PIL import Image
 from iptcinfo3 import IPTCInfo
 from pathlib import Path
 from datetime import datetime
+from slugify import slugify
 import os
 import logging
 import shutil
@@ -294,6 +295,10 @@ class Photo(db.Model):
     isovalue = db.Column(db.Integer)
     software = db.Column(db.String(200))
     exposuretime = db.Column(db.String(10))
+
+    def getExportName(self):
+        return "{}-{}.zip".format(
+            slugify(self.headline), self.md5[-4:])
 
     @hybrid_property
     def extension(self):

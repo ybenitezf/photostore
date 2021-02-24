@@ -228,7 +228,7 @@ class StorageController(object):
 
     def makePhotoZip(self, photo: Photo, web_ready=True) -> 'str':
         archive_name = os.path.join(
-            tempfile.gettempdir(), "{}.zip".format(photo.md5))
+            tempfile.gettempdir(), photo.getExportName())
         work_dir = tempfile.TemporaryDirectory()
         foto_file_name = os.path.join(
             work_dir.name, "{}.{}".format(photo.md5, photo.extension))
@@ -321,7 +321,7 @@ class StorageController(object):
         return
 
     def exportCoverage(self, cov: PhotoCoverage, web_ready=True):
-        slug = slugify("{} {}".format(cov.id, cov.headline))
+        slug = slugify("{} {}".format(cov.headline, cov.id[-4:]))
         archive_name = os.path.join(
             tempfile.gettempdir(), "{}.zip".format(slug))
         work_dir = tempfile.TemporaryDirectory()
@@ -331,7 +331,7 @@ class StorageController(object):
             # make the photo zip
             photo_archive = self.makePhotoZip(p, web_ready=web_ready)
             photo_list.append(shutil.move(photo_archive, work_dir.name))
-            photo_list.append(shutil.copy(p.thumbnail, work_dir.name))
+            # photo_list.append(shutil.copy(p.thumbnail, work_dir.name))
 
         meta_file_name = os.path.join(
             work_dir.name, "META-INFO.json")

@@ -39,9 +39,7 @@ class PhotoCoverageExportSchema(ma.SQLAlchemySchema):
     keywords = fields.Method('get_keywords')
     credit_line = ma.auto_field()
     author = fields.Nested(UserSchema)
-    photos = fields.List(
-        fields.Nested(lambda: PhotoExportSchema(only=("md5",)))
-    )
+    photos = fields.Method('getFileList')
     version = fields.Constant("PhotoCoverage:v1")
 
     def get_excerpt(self, obj: PhotoCoverage):
@@ -49,6 +47,12 @@ class PhotoCoverageExportSchema(ma.SQLAlchemySchema):
 
     def get_keywords(self, obj: PhotoCoverage):
         return obj.keywords
+    
+    def getFileList(self, obj: PhotoCoverage):
+        file_list = []
+        for p in obj.photos:
+            file_list.append(p.getExportName())
+        return file_list
 
 
 class PhotoIndexSchema(ma.Schema):
