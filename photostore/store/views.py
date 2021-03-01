@@ -247,8 +247,6 @@ def buscar_indice():
     qp = MultifieldParser([
         "headline", "excerpt", "credit_line",
         "taken_by", "keywords"], ix.schema)
-    photos = []
-    keywords_grp = {}
     with ix.searcher() as s:
         results = PhotoPaginaBusqueda(s.search_page(
             qp.parse(userquery), page, pagelen=9,  groupedby="keywords"))
