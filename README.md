@@ -53,3 +53,4 @@ pip install https://github.com/ybenitezf/photostore/archive/master.tar.gz
 ## Admin commands
 
 - `flask security fixpermissions`: Resolve permissions issues when posible
+- `flask index reindex`: Reindex all objects for search, the index must exists

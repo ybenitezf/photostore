@@ -63,20 +63,25 @@ class PhotoIndexSchema(ma.Schema):
     taken_on = fields.DateTime(format="%Y%m%d%H%M%S")
     taken_by = fields.Str()
     archived = fields.Boolean()
-    keywords = fields.List(fields.Str())
+    keywords = fields.Method('get_keywords')
     credit_line = fields.Str()
-    excerpt = fields.Str()
+    excerpt = fields.Method('get_excerpt')
     headline = fields.Str()
 
-    @post_dump
-    def process_excerpt(self, data, many, **kwargs):
-        field_data = json.loads(data.get('excerpt'))
-        data['keywords'] = ",".join(data.get('keywords'))
-        data['excerpt'] = render_template(
+    def get_keywords(self, obj: Photo):
+        return obj.keywords
+
+    def get_excerpt(self, obj: Photo) -> str:
+        """Build the body for the search
+        
+        This add's to the text of the document the headline, keywords and
+        credits to allow a fulltext search of all that data.
+        """
+        return render_template(
             'store/editorjs/photo_excerpt.txt',
-            data=field_data,
+            data=json.loads(obj.excerpt),
+            photo=obj,
             block_renderer=renderBlock)
-        return data
 
 
 class PhotoExportSchema(ma.SQLAlchemySchema):

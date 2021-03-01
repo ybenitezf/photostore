@@ -1,3 +1,9 @@
+{{ photo.headline|lower }}
+
+{{ photo.taken_by|lower }}
+
+{% for w in photo.keywords %}{{ w|lower }},{% endfor %}
+
 {% for b in data.get('blocks') %}
 {{ block_renderer(b, format='txt')|striptags }}
 {% endfor %}
