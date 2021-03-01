@@ -32,14 +32,15 @@
                 </div>
                 <div class="row">
                     <div class="input-field col s6">
-                        <input data-newcov-target="creditline" type="text" name="creditline" id="creditline_field" class="validate" value="Foto de {{ current_user.name }}" required>
+                        <input data-newcov-target="creditline" type="text" name="creditline" id="creditline_field" class="validate" value="Foto de {{ current_user.getCreditLine() }}" required>
                         <label for="creditline_field">Creditos</label>
                     </div>
                     <div class="input-field col s6">
                         <input data-newcov-target="takenby" type="text" name class="validate" name="taken_by" id="taken_by_field" value="" required />
                         <label for="creditline_field">Author</label>
                         <span class="helper-text">
-                            Si se establece reemplaza los datos en la foto.
+                            Si se establece reemplaza los datos en la foto. <strong>No es, ni tiene porque ser igual a
+                            los creditos</strong>.
                         </span>
                     </div>
                 </div>

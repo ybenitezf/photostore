@@ -103,6 +103,9 @@ class User(UserMixin, db.Model):
     def check_password_hash(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def getCreditLine(self):
+        return self.credit_line or self.name or self.username
+
     def __repr__(self):
         return '<User {}>'.format(self.email or self.username)
 
