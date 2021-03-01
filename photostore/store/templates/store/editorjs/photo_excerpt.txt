@@ -1,3 +1,9 @@
+{{ photo.headline }}
+
+{{ photo.getCreditLine() }}
+
+{% for w in photo.keywords %}{{ w }},{% endfor %}
+
 {% for b in data.get('blocks') %}
 {{ block_renderer(b, format='txt')|striptags }}
 {% endfor %}
