@@ -14,7 +14,7 @@ def read(fname):
 
 setup(
     name='photostore',
-    version='0.0.10',
+    version='0.1.0',
     url='https://github.com/ybenitezf/photostore',
     license='GPL',
     author='Yoel Benítez Fonseca',
