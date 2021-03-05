@@ -83,7 +83,7 @@ export default class  CoverageUploadController extends Controller {
             placeholder: "Escribe aquí una descripción de la cobertura"
         })
         M.Chips.init(this.tagsTarget, {
-            placeholder: "Plabras clave",
+            placeholder: "Palabras clave",
             secondaryPlaceholder: "+Palabra"
         });
 
