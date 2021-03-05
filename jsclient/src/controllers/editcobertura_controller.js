@@ -40,7 +40,7 @@ const restricciones = {
     }
 }
 
-export default class EditCoberturaController extends Controller {
+export default class extends Controller {
     static values = { apiendpoint: String }
     static targets = [ "headline", "creditline", "tags", "excerpt", "updatephotos", "btn" ]
 

@@ -52,19 +52,19 @@
             los cambios se aplicarán también a todas las fotos
         </p>
         <!-- datos de la cobertura -->
-        <div class="mt-5" data-controller="cobertura"
-            data-cobertura-apiendpoint-value="{{ url_for('photos_api.update_coverage', id=cobertura.id) }}">
+        <div class="mt-5" data-controller="editcobertura"
+            data-editcobertura-apiendpoint-value="{{ url_for('photos_api.update_coverage', id=cobertura.id) }}">
             <div class="input-field">
-                <input data-cobertura-target="headline" type="text" name="headline" id="headline_field" class="validate"
+                <input data-editcobertura-target="headline" type="text" name="headline" id="headline_field" class="validate"
                     required autocomplete="off" value="{{ cobertura.headline }}">
                 <label for="headline_field">Título descriptivo</label>
             </div>
             <div class="input-field">
-                <input data-cobertura-target="creditline" type="text" name="creditline" id="creditline_field"
+                <input data-editcobertura-target="creditline" type="text" name="creditline" id="creditline_field"
                     class="validate" value="{{ cobertura.credit_line }}" required>
                 <label for="creditline_field">Creditos</label>
             </div>
-            <div class="input-field" data-controller="chips" data-cobertura-target="tags"
+            <div class="input-field" data-controller="chips" data-editcobertura-target="tags"
                 data-chips-placeholder-value="Palabras clave"
                 data-chips-secondary-value="+Palabra">
                 <input type="hidden" name="tags" id="f_tags" value='{{ cobertura.keywords|tojson|safe }}' data-chips-target="input">
@@ -76,7 +76,7 @@
             </div>
             <div class="input-field px-3 mt-5 mb-5" data-controller="editor"
                 data-editor-placeholder-value="Escribe aquí una descripción de la cobertura"
-                data-cobertura-target="excerpt">
+                data-editcobertura-target="excerpt">
                 <input data-editor-target="input" type="hidden" name="excerpt_data" value='{{ cobertura.excerpt | safe }}'>
                 <div id="excerpt_field" data-editor-target="editor"></div>
             </div>
@@ -84,7 +84,7 @@
                 <div class="col s6">
                     <div class="switch">
                         <label>
-                            <input data-cobertura-target="updatephotos" type="checkbox" name="updatephotos"
+                            <input data-editcobertura-target="updatephotos" type="checkbox" name="updatephotos"
                                 id="updatephotos_id">
                             <span class="lever"></span>
                             Actualizar los datos de todas las fotos
@@ -92,8 +92,8 @@
                     </div>
                 </div>
                 <div class="col s6">
-                    <a class="btn waves-effect waves-light disabled" data-action="click->cobertura#guardar"
-                        data-cobertura-target="btn">Guardar</a>
+                    <a class="btn waves-effect waves-light disabled" data-action="click->editcobertura#guardar"
+                        data-editcobertura-target="btn">Guardar</a>
                 </div>
             </div>
         </div>
