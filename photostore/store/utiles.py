@@ -176,10 +176,14 @@ class StorageController(object):
                     im.thumbnail((nwidth, nheight), resample=Image.BICUBIC)
                     _l("Sharpening")
                     out = im.filter(ImageFilter.SHARPEN)
-                    text = "{} © {} Editora Adelante".format(
-                        photo.credit_line,
-                        photo.taken_on.strftime("%Y")
-                    )
+                    if photo.taken_on:
+                        text = "Editora Adelante © {}".format(
+                            photo.taken_on.strftime("%Y")
+                        )
+                    else:
+                        text = "Editora Adelante © {}".format(
+                            photo.archive_on.strftime("%Y")
+                        )
                     d = ImageDraw.Draw(out, "RGBA")
                     fnt = ImageFont.truetype(
                         current_app.config.get('WHATERMARK_FONT'), 18)
