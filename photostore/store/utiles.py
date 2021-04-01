@@ -202,10 +202,14 @@ class StorageController(object):
                         exif=im.info.get('exif'))
                 else:
                     _l("No modifications needed. Is it an original?")
-                    text = "{} © {} Editora Adelante".format(
-                        photo.credit_line,
-                        photo.taken_on.strftime("%Y")
-                    )
+                    if photo.taken_on:
+                        text = "Editora Adelante © {}".format(
+                            photo.taken_on.strftime("%Y")
+                        )
+                    else:
+                        text = "Editora Adelante © {}".format(
+                            photo.archive_on.strftime("%Y")
+                        )
                     d = ImageDraw.Draw(im, "RGBA")
                     fnt = ImageFont.truetype(
                         current_app.config.get('WHATERMARK_FONT'), 18)
