@@ -249,13 +249,13 @@ def buscar_indice():
     store = FileStorage(str(base / 'photos'))
     ix = store.open_index()
     qp = QueryParser("excerpt", PhotoIndexSchema())
-    keywords_facet = sorting.FieldFacet("keywords", maptype=sorting.Best)
+    keywords_facet = sorting.FieldFacet("keywords", sorting.Count)
     taken_facet = sorting.DateRangeFacet(
         "taken_on",
         datetime.datetime(2002, 1, 1),
         datetime.datetime.now(),
         datetime.timedelta(days=30),
-        maptype=sorting.OrderedList
+        maptype=sorting.Count
     )
 
     with ix.searcher() as s:
@@ -286,7 +286,7 @@ def buscar_indice():
         for k, v in results.groups(name="taken_on").items():
             start, end = k  # es una tupla
             taken_grp[k] = {  # range name
-                "documents": len(v),  # cantidad de documentos
+                "documents": v,  # cantidad de documentos
                 "start": start,
                 "end": end,
                 "link": url_for(
