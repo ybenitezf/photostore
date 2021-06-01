@@ -22,6 +22,9 @@
             {% if can_edit %}
             <a href="{{ url_for('.photo_edit', id=foto.md5) }}" class="waves-effect waves-light btn"><i class="material-icons">edit</i></a>
             {% endif %}
+            <a class="waves-effect waves-light btn" href="{{ url_for('.verCobertura', id=foto.coverages[0].id) }}" title="Cobertura">
+                <i class="material-icons">dashboard</i>
+            </a>
         </div>
     </div>
     <div class="col s8">

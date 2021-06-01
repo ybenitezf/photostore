@@ -334,7 +334,8 @@ class PhotoCoverage(db.Model):
         db.String(32), db.ForeignKey('user.id'), nullable=True)
     author = db.relationship('User', lazy=True)
     archive_on = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    photos = db.relationship('Photo', secondary=gallery, lazy='subquery')
+    photos = db.relationship(
+        'Photo', secondary=gallery, lazy='subquery', backref='coverages')
 
     @hybrid_property
     def keywords(self):

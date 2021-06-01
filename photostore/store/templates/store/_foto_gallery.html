@@ -12,6 +12,10 @@
                     <a class="waves-effect waves-light btn btn-small" href="{{ url_for('.photo_download_page', id=foto.md5) }}">
                         <i class="material-icons">file_download</i>
                     </a>
+
+                    <a class="waves-effect waves-light btn btn-small" href="{{ url_for('.verCobertura', id=foto.coverages[0].id) }}" title="Cobertura">
+                        <i class="material-icons">dashboard</i>
+                    </a>
                 </div>
                 <div class="card-reveal">
                     <span class="card-title grey-text text-darken-4">{{ foto.headline }}<i class="material-icons right">close</i></span>
