@@ -26,7 +26,10 @@
         <div class="card">
             <div class="card-content">
               <!-- titulo -->
-              <span class="card-title photocoverage-headline blue-grey-text text-darken-2">{{ item.headline }}</span>
+              <a class="card-title photocoverage-headline blue-grey-text text-darken-2" 
+                 href="{{ url_for('.verCobertura', id=item.id) }}">
+                 {{ item.headline }}
+              </a>
               <!-- fotos -->
               {% with lista_fotos = item.photos %}
                 {% include "store/_foto_gallery.html" %}

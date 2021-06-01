@@ -186,6 +186,31 @@ def index():
         form=form, can_edit=can_edit_cobertura)
 
 
+def verCobertura_dlc(*args, **kwargs):
+    id = request.view_args['id']
+    cob = PhotoCoverage.query.get_or_404(id)
+    return [
+        {
+            'text': cob.headline,
+            'url': url_for('.verCobertura', id=cob.id)
+        }
+    ]
+
+
+@bp.route('/ver/cobertura/<id>')
+@register_breadcrumb(
+    bp, '.index.verCobertura', '',
+    dynamic_list_constructor=verCobertura_dlc)
+def verCobertura(id):
+    cobertura = PhotoCoverage.query.get_or_404(id)
+    form = SearchPhotosForm()
+    return render_template(
+        "store/ver_cobertura.html",
+        cobertura=cobertura,
+        form=form,
+        can_edit=can_edit_cobertura)
+
+
 def view_editarCobertura_dlc(*args, **kwargs):
     id = request.view_args['id']
     cob = PhotoCoverage.query.get_or_404(id)
