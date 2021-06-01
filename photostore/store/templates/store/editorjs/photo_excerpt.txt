@@ -2,6 +2,8 @@
 
 {{ photo.taken_by|lower }}
 
+{{ photo.credit_line|lower }}
+
 {% for w in photo.keywords %}{{ w|lower }},{% endfor %}
 
 {% for b in data.get('blocks') %}

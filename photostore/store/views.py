@@ -1,6 +1,7 @@
 from photostore import filetools, db
 from photostore.modules.editorjs import renderBlock
 from photostore.permissions import admin_perm
+from photostore.store.whoosh_schemas import PhotoIndexSchema
 from photostore.store.forms import PhotoDetailsForm, SearchPhotosForm
 from photostore.store.models import Photo, PhotoCoverage, PhotoPaginaBusqueda
 from photostore.store.utiles import StorageController
@@ -9,7 +10,8 @@ from photostore.store.permissions import EditPhotoPermission
 from photostore.store.permissions import DownloadPhotoPermission
 from photostore.store.permissions import EDIT_PHOTO, DOWNLOAD_PHOTO
 from whoosh.filedb.filestore import FileStorage
-from whoosh.qparser import MultifieldParser
+from whoosh.qparser import QueryParser
+from whoosh import sorting
 from flask_login import login_required, current_user
 from flask_breadcrumbs import register_breadcrumb, default_breadcrumb_root
 from flask_menu import register_menu, current_menu
@@ -21,6 +23,7 @@ from pathlib import Path
 from werkzeug.utils import redirect, secure_filename
 import os
 import tempfile
+import datetime
 
 bp = Blueprint(
     'photos', __name__, template_folder='templates')
@@ -155,7 +158,8 @@ def photo_edit(id):
         p.headline = form.headline.data
         p.credit_line = form.credit_line.data
         p.excerpt = form.excerpt.data
-        p.keywords = json.loads(form.tags.data)
+        tags = list(filter(None, form.tags.data))
+        p.keywords = [t.lower() for t in tags]
         db.session.add(p)
         db.session.commit()
         # reindexar la foto para que consten los cambios
@@ -244,17 +248,61 @@ def buscar_indice():
     base = Path(current_app.config.get('INDEX_BASE_DIR'))
     store = FileStorage(str(base / 'photos'))
     ix = store.open_index()
-    qp = MultifieldParser([
-        "headline", "excerpt", "credit_line",
-        "taken_by", "keywords"], ix.schema)
+    qp = QueryParser("excerpt", PhotoIndexSchema())
+    keywords_facet = sorting.FieldFacet("keywords", maptype=sorting.Best)
+    taken_facet = sorting.DateRangeFacet(
+        "taken_on",
+        datetime.datetime(2002, 1, 1),
+        datetime.datetime.now(),
+        datetime.timedelta(days=30),
+        maptype=sorting.OrderedList
+    )
+
     with ix.searcher() as s:
         results = PhotoPaginaBusqueda(s.search_page(
-            qp.parse(userquery), page, pagelen=9,  groupedby="keywords"))
+            qp.parse(userquery, debug=False), page, pagelen=9,
+            groupedby={
+                "keywords": keywords_facet,
+                "taken_on": taken_facet,
+            },
+            sortedby="taken_on", reverse=True)
+        )
+
+        keywords_grp = dict()
+        # extraer las agrupaciones por keywords de los resultados
+        for k, v in results.groups(name="keywords").items():
+            keywords_grp[k] = {
+                "documents": v,
+                "text": k,
+                "link": url_for(
+                    '.buscar_indice',
+                    userquery='keywords:"{}" {}'.format(
+                        k, userquery))
+            }
+        # --
+
+        # extraer los rangos de fechas
+        taken_grp = dict()
+        for k, v in results.groups(name="taken_on").items():
+            start, end = k  # es una tupla
+            taken_grp[k] = {  # range name
+                "documents": len(v),  # cantidad de documentos
+                "start": start,
+                "end": end,
+                "link": url_for(
+                    '.buscar_indice',
+                    userquery='taken_on:[{} TO {}] {}'.format(
+                        start.strftime("%Y%m%d"),
+                        end.strftime("%Y%m%d"),
+                        userquery
+                    ))
+             }
+        # --
 
     return render_template(
         'store/search.html',
-        form=form, results=results,
-        userquery=userquery)
+        form=form, results=results, keywords_grp=keywords_grp,
+        taken_grp=taken_grp, userquery=userquery)
 
 
 @bp.route('/upload-form')

@@ -30,7 +30,8 @@ def update_coverage(data, query, id):
     """
     cov = PhotoCoverage.query.get_or_404(id)
     cov.credit_line = data.get('credit_line')
-    cov.keywords = data.get('keywords')
+    tags = list(filter(None, data.get('keywords')))
+    cov.keywords = [t.lower() for t in tags]
     cov.headline = data.get('headline')
     cov.excerpt = data.get('excerpt')
     db.session.add(cov)
@@ -39,7 +40,7 @@ def update_coverage(data, query, id):
         # datos
         for p in cov.photos:
             p.credit_line = data.get('credit_line')
-            p.keywords = data.get('keywords')
+            p.keywords = [t.lower() for t in tags]
             p.headline = data.get('headline')
             p.excerpt = data.get('excerpt')
             db.session.add(p)
@@ -67,7 +68,8 @@ def create_coverage(data):
     )
 
     pc.author_id = current_user.id
-    pc.keywords = data.get('keywords')
+    tags = list(filter(None, data.get('keywords')))
+    pc.keywords = [t.lower() for t in tags]
     # agregar las fotos
     for p_id in data.get('photos'):
         photo = Photo.query.get_or_404(p_id)
