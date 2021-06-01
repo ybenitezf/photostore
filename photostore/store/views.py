@@ -249,7 +249,7 @@ def buscar_indice():
     store = FileStorage(str(base / 'photos'))
     ix = store.open_index()
     qp = QueryParser("excerpt", PhotoIndexSchema())
-    keywords_facet = sorting.FieldFacet("keywords", sorting.Count)
+    keywords_facet = sorting.FieldFacet("keywords", maptype=sorting.Count)
     taken_facet = sorting.DateRangeFacet(
         "taken_on",
         datetime.datetime(2002, 1, 1),
