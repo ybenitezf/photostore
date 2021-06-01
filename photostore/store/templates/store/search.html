@@ -19,7 +19,7 @@
 {% block content %}
 
 <div class="row">
-    <form action="{{ url_for('.buscar_indice') }}" method="POST" class="col s12 px-5">
+    <form action="{{ url_for('.buscar_indice') }}" method="GET" class="col s12 px-5">
         {{ form.csrf_token }}
         <div class="col s11 input-field">
             <input placeholder="Escribe para buscar" id="userq_field" type="search" class="validate" name="userquery" value="{{ userquery }}" required>
@@ -33,11 +33,39 @@
     </form>
 </div>
 
-<div class="results-wrapper container">
+
+<div class="results-wrapper px-5">
 
         {% if results.is_empty() is false %}
         <div class="row">
-            <div class="col s12">
+            <div class="col s3">
+                <!-- filtros -->
+                <h6>Palabras clave</h6>
+                <div class="collection">
+                    {% for k, v in keywords_grp.items() %}
+                    <a href="{{ v['link'] }}" class="collection-item">
+                        <span class="badge">{{ v['documents'] }}</span> {{ v['text'] }}
+                    </a>
+                    {% endfor %}
+                </div>
+
+                <h6>Fechas</h6>
+                <div class="collection">
+                    {% for v in taken_grp.values() %}
+                    <a href="{{ v['link'] }}" class="collection-item">
+                        <span class="badge">{{ v['documents'] }}</span>
+                        <i class="material-icons left">date_range</i>
+                        <span data-controller="fecha" data-fecha-momento-value="{{ v['start'].isoformat() }}" data-fecha-formato-value="ll">
+                            {{ v['start'].isoformat() }}
+                        </span> - 
+                        <span data-controller="fecha" data-fecha-momento-value="{{ v['end'].isoformat() }}" data-fecha-formato-value="ll">
+                            {{ v['end'].isoformat() }}
+                        </span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col s9">
                 <!-- resultados -->
 
                 {% with lista_fotos = results.getObjects() %}
@@ -64,6 +92,4 @@
 
 
 {% endblock content%}
-
-
 
