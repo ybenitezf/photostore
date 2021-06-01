@@ -201,7 +201,7 @@ class Media(db.Model):
             image_width=width,
             image_height=height
         )
-        photo.keywords = tags
+        photo.keywords = [t.lower() for t in tags]
         photo.credit_line = user_data.get('creditline')
         photo.excerpt = user_data.get('excerpt')
         photo.headline = user_data.get('headline')
