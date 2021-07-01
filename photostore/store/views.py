@@ -25,6 +25,7 @@ import os
 import tempfile
 import datetime
 
+
 bp = Blueprint(
     'photos', __name__, template_folder='templates')
 default_breadcrumb_root(bp, '.index')
@@ -309,19 +310,20 @@ def buscar_indice():
         # extraer los rangos de fechas
         taken_grp = dict()
         for k, v in results.groups(name="taken_on").items():
-            start, end = k  # es una tupla
-            taken_grp[k] = {  # range name
-                "documents": v,  # cantidad de documentos
-                "start": start,
-                "end": end,
-                "link": url_for(
-                    '.buscar_indice',
-                    userquery='taken_on:[{} TO {}] {}'.format(
-                        start.strftime("%Y%m%d"),
-                        end.strftime("%Y%m%d"),
-                        userquery
-                    ))
-             }
+            if k is not None:
+                start, end = k  # es una tupla
+                taken_grp[k] = {  # range name
+                    "documents": v,  # cantidad de documentos
+                    "start": start,
+                    "end": end,
+                    "link": url_for(
+                        '.buscar_indice',
+                        userquery='taken_on:[{} TO {}] {}'.format(
+                            start.strftime("%Y%m%d"),
+                            end.strftime("%Y%m%d"),
+                            userquery
+                        ))
+                }
         # --
 
     return render_template(
