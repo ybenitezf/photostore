@@ -158,7 +158,7 @@ def photo_edit(id):
         p.headline = form.headline.data
         p.credit_line = form.credit_line.data
         p.excerpt = form.excerpt.data
-        tags = list(filter(None, form.tags.data))
+        tags = list(filter(None, json.loads(form.tags.data)))
         p.keywords = [t.lower() for t in tags]
         db.session.add(p)
         db.session.commit()
