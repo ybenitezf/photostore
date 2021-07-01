@@ -27,7 +27,7 @@
 
                     <p><i class="material-icons left">person</i> {{ foto.taken_by }}</p>
                     <p><i class="material-icons left">file_upload</i> {{foto.uploader.name}}</p>
-                    <p><i class="material-icons left">event</i> {{foto.taken_on}}</p>
+                    {% if photo.taken_on %}<p><i class="material-icons left">event</i> {{foto.taken_on}}</p>{% endif %}
                     <!-- opcionales -->
                     {% if foto.camera %}<div class="exiftag"><i class="exificon material-icons">camera_alt</i> {{foto.camera}}</div>{% endif %}
                     {% if foto.fnumber %}<div class="exiftag"><i class="exificon material-icons">camera</i> f/{{foto.fnumber}}</div>{% endif %}
