@@ -44,12 +44,14 @@
             <div class="col s6">
                 <p><i class="material-icons left">person</i> {{ foto.taken_by }}</p>
                 <p><i class="material-icons left">file_upload</i> {{foto.uploader.name}}</p>
+                {% if foto.taken_on %}
                 <p>
                     <i class="material-icons left">event</i> 
                     <span data-controller="fecha" data-fecha-momento-value="{{ foto.taken_on.isoformat() }}" data-fecha-formato-value="L">
                         {{foto.taken_on.isoformat()}}
                     </span>
                 </p>
+                {% endif %}
             </div>
             <div class="col s6">
                 <!-- opcionales -->
